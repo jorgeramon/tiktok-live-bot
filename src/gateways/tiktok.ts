@@ -1,6 +1,6 @@
 // NestJS
-import { IChatEvent } from "@interfaces/chat-event";
-import { IOnlineEvent } from "@interfaces/online-event";
+import { IChatMessage } from "@interfaces/chat-message";
+import { IOnlineMessage } from "@interfaces/online-message";
 import { Controller } from "@nestjs/common";
 import { EventPattern } from "@nestjs/microservices";
 
@@ -8,12 +8,12 @@ import { EventPattern } from "@nestjs/microservices";
 export class TikTokGateway {
 
     @EventPattern('tiktok.online')
-    isOnline(event: IOnlineEvent) {
+    isOnline(event: IOnlineMessage) {
         console.log(event);
     }
 
     @EventPattern('tiktok.chat')
-    receiveChat(event: IChatEvent) {
-        console.log(event);
+    receiveChat(event: IChatMessage) {
+        //console.log(event);
     }
 }
