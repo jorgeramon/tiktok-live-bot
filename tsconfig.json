@@ -20,6 +20,8 @@
     "paths": {
       "@gateways/*": ["./gateways/*"],
       "@interfaces/*": ["./interfaces/*"],
+      "@schemas/*": ["./schemas/*"],
+      "@repositories/*": ["./repositories/*"],
       "@enums/*": ["./enums/*"]
     }
   }

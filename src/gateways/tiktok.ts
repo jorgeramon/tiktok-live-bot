@@ -1,8 +1,10 @@
 // NestJS
-import { IChatMessage } from "@interfaces/chat-message";
-import { IOnlineMessage } from "@interfaces/online-message";
 import { Controller } from "@nestjs/common";
 import { EventPattern } from "@nestjs/microservices";
+
+// Interfaces
+import { IChatMessage } from "@interfaces/chat-message";
+import { IOnlineMessage } from "@interfaces/online-message";
 
 @Controller()
 export class TikTokGateway {
