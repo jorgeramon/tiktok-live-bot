@@ -13,6 +13,9 @@ export class Live {
 
     @Prop({ required: true, unique: true })
     stream_id: bigint;
+
+    @Prop({ default: true })
+    is_online: boolean;
 }
 
 export const LiveSchema =
