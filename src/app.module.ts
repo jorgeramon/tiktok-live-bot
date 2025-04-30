@@ -2,6 +2,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { APP_GUARD } from '@nestjs/core';
 
 // Enums
 import { Environment } from '@enums/environment';
@@ -18,9 +19,14 @@ import { Request, RequestSchema } from '@schemas/request';
 import { AccountRepository } from '@repositories/account';
 import { LiveRepository } from '@repositories/live';
 import { RequestRepository } from '@repositories/request';
+import { FeatureRepository } from '@repositories/feature';
 
 // Services
 import { LiveService } from '@services/live';
+import { Setup } from '@services/setup';
+
+// Guards
+import { AccountGuard } from '@guards/account';
 
 @Module({
   imports: [
@@ -45,7 +51,13 @@ import { LiveService } from '@services/live';
     AccountRepository,
     LiveRepository,
     RequestRepository,
-    LiveService
+    FeatureRepository,
+    LiveService,
+    Setup,
+    {
+      provide: APP_GUARD,
+      useClass: AccountGuard,
+    }
   ],
 })
 export class AppModule { }

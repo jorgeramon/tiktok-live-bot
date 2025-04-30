@@ -1,14 +1,16 @@
 // NestJS
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 
 // Local
 import { Account } from './account';
 
+// NPM
+import { Document, Schema as MongooseSchema, Types } from 'mongoose';
+
 @Schema({ timestamps: true, collection: 'lives' })
 export class Live {
 
-    @Prop({ type: MongooseSchema.Types.ObjectId, ref: Account.name, required: true })
+    @Prop({ type: Types.ObjectId, ref: Account.name, required: true })
     account_id: MongooseSchema.Types.ObjectId;
 
     @Prop({ required: true, unique: true })

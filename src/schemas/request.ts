@@ -1,9 +1,11 @@
 // NestJS
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 
 // Local
 import { Live } from './live';
+
+// NPM
+import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 
 @Schema({ timestamps: true, collection: 'requests' })
 export class Request {

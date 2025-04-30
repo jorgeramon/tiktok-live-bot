@@ -23,7 +23,9 @@
       "@schemas/*": ["./schemas/*"],
       "@repositories/*": ["./repositories/*"],
       "@services/*": ["./services/*"],
-      "@enums/*": ["./enums/*"]
+      "@guards/*": ["./guards/*"],
+      "@enums/*": ["./enums/*"],
+      "@utils/*": ["./utils/*"]
     }
   }
 }

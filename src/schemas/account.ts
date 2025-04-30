@@ -1,5 +1,7 @@
 // NestJS
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+
+// Local
 import { Document } from 'mongoose';
 
 @Schema({ timestamps: true, collection: 'accounts' })

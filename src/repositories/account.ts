@@ -18,6 +18,11 @@ export class AccountRepository {
         @InjectModel(Account.name) private readonly model: Model<Account>
     ) { }
 
+    async findAll(): Promise<IAccount[]> {
+        const documents: AccountDocument[] = await this.model.find();
+        return documents.map(document => document.toJSON()) as IAccount[];
+    }
+
     async save(data: Partial<IAccount>): Promise<IAccount> {
         const document: AccountDocument = await new this.model(data).save();
         return document.toJSON() as IAccount;
