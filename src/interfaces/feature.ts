@@ -1,7 +1,7 @@
 // Enums
 import { FeatureType } from "@enums/feature-type";
 
-export interface IQueueFeature {
+export interface IRequestFeature {
     prefix: string | null;
     add_variants: string[];
 }
@@ -10,5 +10,5 @@ export interface IFeature {
     account_id: string;
     type: FeatureType;
     enabled: boolean;
-    config: IQueueFeature | null;
+    config: IRequestFeature | null;
 }

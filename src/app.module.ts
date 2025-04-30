@@ -23,10 +23,38 @@ import { FeatureRepository } from '@repositories/feature';
 
 // Services
 import { LiveService } from '@services/live';
-import { Setup } from '@services/setup';
+import { CacheService } from '@services/cache';
 
 // Guards
 import { AccountGuard } from '@guards/account';
+
+// Core
+import { Setup } from '@core/setup';
+import { CommandResolver } from '@core/command-resolver';
+
+const CORE = [
+  Setup,
+  CommandResolver,
+];
+
+const REPOSITORIES = [
+  AccountRepository,
+  LiveRepository,
+  RequestRepository,
+  FeatureRepository,
+];
+
+const SERVICES = [
+  LiveService,
+  CacheService
+];
+
+const GUARDS = [
+  {
+    provide: APP_GUARD,
+    useClass: AccountGuard,
+  }
+];
 
 @Module({
   imports: [
@@ -48,16 +76,10 @@ import { AccountGuard } from '@guards/account';
     TikTokGateway
   ],
   providers: [
-    AccountRepository,
-    LiveRepository,
-    RequestRepository,
-    FeatureRepository,
-    LiveService,
-    Setup,
-    {
-      provide: APP_GUARD,
-      useClass: AccountGuard,
-    }
+    ...CORE,
+    ...REPOSITORIES,
+    ...SERVICES,
+    ...GUARDS
   ],
 })
 export class AppModule { }

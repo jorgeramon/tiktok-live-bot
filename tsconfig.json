@@ -25,6 +25,7 @@
       "@services/*": ["./services/*"],
       "@guards/*": ["./guards/*"],
       "@enums/*": ["./enums/*"],
+      "@core/*": ["./core/*"],
       "@utils/*": ["./utils/*"]
     }
   }

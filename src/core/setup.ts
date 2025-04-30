@@ -10,7 +10,7 @@ import { AccountRepository } from "@repositories/account";
 import { FeatureRepository } from "@repositories/feature";
 
 // Local
-import { CacheService } from "./cache";
+import { CacheService } from "../services/cache";
 
 @Injectable()
 export class Setup implements OnApplicationBootstrap {

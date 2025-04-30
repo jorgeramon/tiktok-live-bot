@@ -1,3 +1,3 @@
 export enum FeatureType {
-    QUEUE = 'queue'
+    REQUEST = 'request'
 }

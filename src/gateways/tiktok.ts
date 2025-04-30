@@ -9,18 +9,24 @@ import { IOnlineMessage } from "@interfaces/online-message";
 // Services
 import { LiveService } from "@services/live";
 
+// Core
+import { CommandResolver } from "@core/command-resolver";
+
 @Controller()
 export class TikTokGateway {
 
-    constructor (private readonly live_service: LiveService) {}
+    constructor (
+        private readonly command_resolver: CommandResolver,
+        private readonly live_service: LiveService
+    ) {}
 
     @EventPattern('tiktok.online')
-    async isOnline(event: IOnlineMessage) {
+    async isOnline(event: IOnlineMessage): Promise<void> {
         await this.live_service.setOnlineStatus(event);
     }
 
     @EventPattern('tiktok.chat')
-    receiveChat(event: IChatMessage) {
-        //console.log(event);
+    async receiveChat(event: IChatMessage): Promise<void> {
+        await this.command_resolver.resolve(event);
     }
 }
