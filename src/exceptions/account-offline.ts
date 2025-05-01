@@ -1,0 +1,1 @@
+export class AccountOfflineException extends Error {}

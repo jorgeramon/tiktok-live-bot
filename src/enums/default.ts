@@ -1,4 +1,5 @@
-export enum DefaultRequestFeature {
+export enum DefaultRequestConfig {
     PREFIX = '!',
-    PLAY = 'hola'
+    PLAY = 'hola',
+    MAXIMUM_PER_ACCOUNT = 1
 }

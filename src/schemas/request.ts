@@ -14,9 +14,6 @@ export class Request {
     live_id: MongooseSchema.Types.ObjectId;
 
     @Prop({ required: true })
-    stream_id: bigint;
-
-    @Prop({ required: true })
     user_id: bigint;
 
     @Prop({ required: true })
@@ -26,7 +23,7 @@ export class Request {
     user_picture: string;
 
     @Prop({ required: true })
-    song: string;
+    request: string;
 }
 
 export const RequestSchema =

@@ -13,8 +13,8 @@ import { CacheService } from "@services/cache";
 import { UnresolvableAccountException } from "@exceptions/unresolvable-account";
 
 // Enums
-import { DefaultRequestFeature } from "@enums/default";
-import { RequestFeatureEvent } from "@enums/event";
+import { DefaultRequestConfig } from "@enums/default";
+import { RequestCommandEvent } from "@enums/event";
 
 @Injectable()
 export class CommandResolver {
@@ -32,16 +32,18 @@ export class CommandResolver {
         if (!account) {
             throw new UnresolvableAccountException();
         }
-        const command = `${DefaultRequestFeature.PREFIX}${DefaultRequestFeature.PLAY}`;
+
+        const command = `${DefaultRequestConfig.PREFIX}${DefaultRequestConfig.PLAY}`;
         const normalized_comment = event.comment.toLowerCase();
 
         if (normalized_comment.startsWith(command)) {
-            this.event_emitter.emit(RequestFeatureEvent.PLAY, {
+            this.event_emitter.emit(RequestCommandEvent.PLAY, {
                 account_id: account._id,
-                user_id: event.owner_id,
-                user_nickname: event.owner_nickname,
+                user_id: event.user_id,
+                user_nickname: event.user_nickname,
+                user_picture: event.user_picture,
                 stream_id: event.stream_id,
-                arguments: normalized_comment.replace(command, '').trim()
+                argument: normalized_comment.replace(command, '').trim()
             });
         }
     }
