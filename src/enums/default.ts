@@ -1,4 +1,4 @@
 export enum DefaultRequestFeature {
     PREFIX = '!',
-    ADD = 'play'
+    PLAY = 'hola'
 }

@@ -1,6 +1,6 @@
 // Local
-import { IUserMessage } from "./user-message";
+import { IMessage } from "./message";
 
-export interface IEndMessage extends IUserMessage {
+export interface IEndMessage extends IMessage {
 
 }

@@ -1,35 +1,50 @@
 // NestJS
-import { Inject, Injectable } from "@nestjs/common";
+import { Inject, Injectable, OnApplicationBootstrap } from "@nestjs/common";
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
+import { OnEvent } from "@nestjs/event-emitter";
 
 // Interfaces
 import { IAccount } from "@interfaces/account";
-import { IFeature } from "@interfaces/feature";
 
 // Enums
-import { FeatureType } from "@enums/feature-type";
+import { AccountEvent } from "@enums/event";
+
+// Repositories
+import { AccountRepository } from "@repositories/account";
 
 // Utils
 import { CacheUtils } from "@utils/cache-utils";
 
 @Injectable()
-export class CacheService {
+export class CacheService implements OnApplicationBootstrap {
 
-    constructor (@Inject(CACHE_MANAGER) private cache_manager: Cache) {}
+    constructor(
+        @Inject(CACHE_MANAGER) private readonly cache_manager: Cache,
+        private readonly account_repository: AccountRepository,
+    ) { }
 
-    async setAccounts(accounts: IAccount[]): Promise<void> {
+    async onApplicationBootstrap() {
+        await this.loadAccounts();
+    }
+
+    @OnEvent(AccountEvent.CREATED)
+    async onAccountCreated(account: IAccount): Promise<void> {
+        const accounts: IAccount[] = await this.getAccounts();
+        await this.cache_manager.set<IAccount[]>(CacheUtils.ACCOUNTS_KEY(), [ ...accounts, account ]);
+    }
+
+    async getAccounts(): Promise<IAccount[]> {
+        const cache_accounts: IAccount[] | null = await this.cache_manager.get<IAccount[]>(CacheUtils.ACCOUNTS_KEY());
+        return cache_accounts ?? [];
+    }
+
+    async getAccountByNickname(nickname: string): Promise<IAccount | null> {
+        const cache_accounts: IAccount[] = await this.getAccounts();
+        return cache_accounts.find(account => account.nickname === nickname) ?? null;
+    }
+
+    private async loadAccounts(): Promise<void> {
+        const accounts: IAccount[] = await this.account_repository.findAll();
         await this.cache_manager.set<IAccount[]>(CacheUtils.ACCOUNTS_KEY(), accounts);
-    }
-
-    async getAccounts(): Promise<IAccount[] | null> {
-        return this.cache_manager.get<IAccount[]>(CacheUtils.ACCOUNTS_KEY());
-    }
-
-    async setFeature(account_id: string, type: FeatureType, feature: IFeature): Promise<void> {
-        await this.cache_manager.set(CacheUtils.FEATURE_KEY(account_id, type), feature);
-    }
-
-    async getFeature(account_id: string, type: FeatureType): Promise<IFeature | null> {
-        return this.cache_manager.get(CacheUtils.FEATURE_KEY(account_id, type));
     }
 }

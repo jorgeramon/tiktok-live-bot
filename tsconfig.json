@@ -26,7 +26,8 @@
       "@guards/*": ["./guards/*"],
       "@enums/*": ["./enums/*"],
       "@core/*": ["./core/*"],
-      "@utils/*": ["./utils/*"]
+      "@utils/*": ["./utils/*"],
+      "@exceptions/*": ["./exceptions/*"],
     }
   }
 }

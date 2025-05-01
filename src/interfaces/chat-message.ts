@@ -1,7 +1,7 @@
 // Local
-import { IUserMessage } from "./user-message";
+import { IMessage } from "./message";
 
-export interface IChatMessage extends IUserMessage {
+export interface IChatMessage extends IMessage {
     comment: string;
     user_nickname: string;
     user_id: bigint;

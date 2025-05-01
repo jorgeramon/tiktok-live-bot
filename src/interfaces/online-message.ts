@@ -1,7 +1,7 @@
 // Local
-import { IUserMessage } from "./user-message";
+import { IMessage } from "./message";
 
-export interface IOnlineMessage extends IUserMessage {
+export interface IOnlineMessage extends IMessage {
     title: string;
     share_url: string;
     picture_large: string;

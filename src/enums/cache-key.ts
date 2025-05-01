@@ -1,4 +1,4 @@
 export enum CacheKey {
-    ACCOUNTS = '$accounts$',
-    FEATURE = '$feature$'
+    ACCOUNTS = '$_accounts_$', 
+    FEATURES = '$_features_$'
 }

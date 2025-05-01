@@ -3,6 +3,8 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
 import { APP_GUARD } from '@nestjs/core';
+import { CacheModule } from '@nestjs/cache-manager';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 // Enums
 import { Environment } from '@enums/environment';
@@ -19,7 +21,6 @@ import { Request, RequestSchema } from '@schemas/request';
 import { AccountRepository } from '@repositories/account';
 import { LiveRepository } from '@repositories/live';
 import { RequestRepository } from '@repositories/request';
-import { FeatureRepository } from '@repositories/feature';
 
 // Services
 import { LiveService } from '@services/live';
@@ -29,19 +30,18 @@ import { CacheService } from '@services/cache';
 import { AccountGuard } from '@guards/account';
 
 // Core
-import { Setup } from '@core/setup';
 import { CommandResolver } from '@core/command-resolver';
+import { RequestResolver } from '@core/request-resolver';
 
 const CORE = [
-  Setup,
   CommandResolver,
+  RequestResolver,
 ];
 
 const REPOSITORIES = [
   AccountRepository,
   LiveRepository,
   RequestRepository,
-  FeatureRepository,
 ];
 
 const SERVICES = [
@@ -69,8 +69,10 @@ const GUARDS = [
     MongooseModule.forFeature([
       { name: Account.name, schema: AccountSchema },
       { name: Live.name, schema: LiveSchema },
-      { name: Request.name, schema: RequestSchema }
-    ])
+      { name: Request.name, schema: RequestSchema },
+    ]),
+    CacheModule.register(),
+    EventEmitterModule.forRoot()
   ],
   controllers: [
     TikTokGateway
