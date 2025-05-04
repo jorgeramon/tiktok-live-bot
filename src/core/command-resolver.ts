@@ -34,7 +34,7 @@ export class CommandResolver {
         }
 
         const command = `${DefaultRequestConfig.PREFIX}${DefaultRequestConfig.PLAY}`;
-        const normalized_comment = event.comment.toLowerCase();
+        const normalized_comment = event.comment.trim().toLowerCase();
 
         if (normalized_comment.startsWith(command)) {
             this.event_emitter.emit(RequestCommandEvent.PLAY, {
