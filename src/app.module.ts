@@ -5,12 +5,15 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { APP_GUARD } from '@nestjs/core';
 import { CacheModule } from '@nestjs/cache-manager';
 import { EventEmitterModule } from '@nestjs/event-emitter';
+import { ClientsModule, Transport } from '@nestjs/microservices';
 
 // Enums
 import { Environment } from '@enums/environment';
 
+// Controllers
+import { TiktokController } from '@controllers/tiktok';
+
 // Gateways
-import { TikTokGateway } from '@gateways/tiktok';
 import { SocketGateway } from '@gateways/socket';
 
 // Schemas
@@ -76,11 +79,23 @@ const GATEWAYS = [
       { name: Live.name, schema: LiveSchema },
       { name: Request.name, schema: RequestSchema },
     ]),
+    ClientsModule.registerAsync([{
+      name: 'MESSAGE_BROKER',
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        transport: Transport.REDIS,
+        options: {
+          host: configService.get<string>(Environment.REDIS_HOST),
+          port: configService.get<number>(Environment.REDIS_PORT),
+        }
+      }),
+    }]),
     CacheModule.register(),
     EventEmitterModule.forRoot()
   ],
   controllers: [
-    TikTokGateway
+    TiktokController
   ],
   providers: [
     ...CORE,

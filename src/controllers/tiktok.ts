@@ -17,9 +17,9 @@ import { LiveService } from "@services/live";
 import { CommandResolver } from "@core/command-resolver";
 
 @Controller()
-export class TikTokGateway {
+export class TiktokController {
 
-    private readonly logger: Logger = new Logger(TikTokGateway.name);
+    private readonly logger: Logger = new Logger(TiktokController.name);
 
     constructor (
         private readonly command_resolver: CommandResolver,
@@ -28,7 +28,7 @@ export class TikTokGateway {
 
     @EventPattern(TiktokEvent.ONLINE)
     async isOnline(event: IOnlineMessage): Promise<void> {
-        this.logger.log(`Account ${event.owner_nickname} is online`);
+        this.logger.debug(`Account ${event.owner_nickname} is online`);
         await this.live_service.setOnlineStatus(event);
     }
 
@@ -39,7 +39,7 @@ export class TikTokGateway {
 
     @EventPattern(TiktokEvent.END)
     async isOffline(event: IEndMessage): Promise<void> {
-        this.logger.log(`Account ${event.owner_nickname} is offline`);
+        this.logger.debug(`Account ${event.owner_nickname} is offline`);
         await this.live_service.setOfflineStatus(event);
     }
 }

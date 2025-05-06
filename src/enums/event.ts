@@ -1,7 +1,8 @@
 export enum TiktokEvent {
     ONLINE = 'tiktok.online',
     CHAT = 'tiktok.chat',
-    END = 'tiktok.end'
+    END = 'tiktok.end',
+    IS_ONLINE = 'tiktok.is_online'
 }
 
 export enum AccountEvent {
