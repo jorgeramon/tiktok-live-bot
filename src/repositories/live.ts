@@ -33,11 +33,15 @@ export class LiveRepository {
         return document !== null ? document.toJSON() as ILive : null;
     }
 
-    async setOfflineStatus(account_id: string): Promise<void> {
+    async updateStatusByAccountId(account_id: string, is_online = false): Promise<void> {
         const live: ILive | null = await this.findCurrentOnline(account_id);
 
         if (live !== null) {
-            await this.model.findByIdAndUpdate(live._id, { $set: { is_online: false } });
+            await this.updateStatusById(live._id, is_online);
         }
+    }
+
+    async updateStatusById(_id: string, is_online = false): Promise<void> {
+        await this.model.findByIdAndUpdate(_id, { $set: { is_online } });
     }
 }

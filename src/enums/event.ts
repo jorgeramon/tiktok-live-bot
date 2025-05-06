@@ -1,3 +1,9 @@
+export enum TiktokEvent {
+    ONLINE = 'tiktok.online',
+    CHAT = 'tiktok.chat',
+    END = 'tiktok.end'
+}
+
 export enum AccountEvent {
     CREATED = 'account.created'
 }
