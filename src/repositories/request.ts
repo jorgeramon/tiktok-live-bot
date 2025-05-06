@@ -18,6 +18,11 @@ export class RequestRepository {
         @InjectModel(Request.name) private readonly model: Model<Request>
     ) { }
 
+    async findByLiveId(live_id: string): Promise<IRequest[]> {
+        const documents: RequestDocument[] = await this.model.find({ live_id });
+        return documents.map(document => document.toJSON()) as IRequest[];
+    }
+
     async findByLiveIdAndUserId(live_id: string, user_id: bigint): Promise<IRequest[]> {
         const documents: RequestDocument[] = await this.model.find({ live_id, user_id });
         return documents.map(document => document.toJSON()) as IRequest[];

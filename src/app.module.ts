@@ -11,6 +11,7 @@ import { Environment } from '@enums/environment';
 
 // Gateways
 import { TikTokGateway } from '@gateways/tiktok';
+import { SocketGateway } from '@gateways/socket';
 
 // Schemas
 import { Account, AccountSchema } from '@schemas/account';
@@ -56,6 +57,10 @@ const GUARDS = [
   }
 ];
 
+const GATEWAYS = [
+  SocketGateway
+];
+
 @Module({
   imports: [
     ConfigModule.forRoot(),
@@ -81,7 +86,8 @@ const GUARDS = [
     ...CORE,
     ...REPOSITORIES,
     ...SERVICES,
-    ...GUARDS
+    ...GUARDS,
+    ...GATEWAYS
   ],
 })
 export class AppModule { }

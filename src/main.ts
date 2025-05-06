@@ -8,6 +8,7 @@ import { AppModule } from './app.module';
 
 // Enums
 import { Environment } from '@enums/environment';
+import { WebSocketModule } from 'websocket.module';
 
 async function bootstrap() {
 
