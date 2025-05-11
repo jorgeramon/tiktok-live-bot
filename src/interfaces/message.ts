@@ -1,5 +1,5 @@
 export interface IMessage {
-    stream_id: bigint;
-    owner_id: bigint;
-    owner_nickname: string;
+    stream_id: string;
+    owner_id: string;
+    owner_username: string;
 }

@@ -1,77 +1,57 @@
-// NestJS
-import { Inject, Injectable, Logger, OnApplicationBootstrap } from "@nestjs/common";
-import { ClientProxy } from "@nestjs/microservices";
-import { TiktokEvent } from "@enums/event";
-
-// Interfaces
-import { IOnlineMessage } from "@interfaces/online-message";
-import { ILive } from "@interfaces/live";
+import { UnresolvableAccountException } from "@exceptions/unresolvable-account";
 import { IAccount } from "@interfaces/account";
-import { IEndMessage } from "@interfaces/end-message";
-
-// Repositories
-import { LiveRepository } from "@repositories/live";
+import { ILive } from "@interfaces/live";
+import { Injectable, Logger } from "@nestjs/common";
 import { AccountRepository } from "@repositories/account";
-
-// NPM
-import { lastValueFrom } from "rxjs";
+import { LiveRepository } from "@repositories/live";
 
 @Injectable()
-export class LiveService implements OnApplicationBootstrap {
+export class LiveService {
 
     private readonly logger: Logger = new Logger(LiveService.name);
 
     constructor(
-        @Inject('MESSAGE_BROKER') private readonly client: ClientProxy,
-        private readonly live_repository: LiveRepository,
-        private readonly account_repository: AccountRepository
+        private readonly account_repository: AccountRepository,
+        private readonly live_repository: LiveRepository
     ) { }
 
-    async onApplicationBootstrap(): Promise<void> {
-        try {
-            this.logger.debug('Getting accounts live status');
+    async setOnlineStatus(username: string, is_online: boolean, stream_id?: string): Promise<void> {
+        this.logger.debug(`Setting LIVE status ${is_online ? 'online' : 'offline'} to ${username} - ${stream_id ?? 'NO STREAM ID'}`);
 
-            const accounts: IAccount[] = await this.account_repository.findAll();
+        const account: IAccount | null = await this.account_repository.findOneByUsername(username);
 
-            for (const account of accounts) {
-                const status = await lastValueFrom(this.client.send<IOnlineMessage | null>(TiktokEvent.IS_ONLINE, account.nickname));
-
-                if (status !== null) {
-                    this.logger.debug(`Account ${status.owner_nickname} is online`);
-                    await this.setOnlineStatus(status);
-                }
-            }
-        } catch (err) {
-            this.logger.error(`Unexpected error ocurred on service boostrap: ${err.message}`);
-        }
-    }
-
-    async setOnlineStatus(event: IOnlineMessage): Promise<void> {
-        const live: ILive | null = await this.live_repository.findOneByStreamId(event.stream_id);
-
-        if (live !== null) {
-            this.logger.debug(`Live ${live.stream_id} is already associated to ${event.owner_nickname}`);
-            return;
+        if (account == null) {
+            throw new UnresolvableAccountException(username);
         }
 
-        this.logger.debug(`Associating live ${event.stream_id} to ${event.owner_nickname} - ${event.owner_id}`);
-        const account: IAccount | null = await this.account_repository.findOneByNickname(event.owner_nickname);
+        const live: ILive | null = await this.live_repository.findCurrentOnline(account._id);
 
-        if (account === null) {
-            this.logger.error(`Account ${event.owner_nickname} not found, this shouldn't be possible`);
-            return;
-        }
+        const stream_found = live !== null;
+        const no_stream_found = !live;
+        const isnt_same_stream = stream_found && live.stream_id !== stream_id;
 
-        await this.live_repository.updateStatusByAccountId(account._id);
-        await this.live_repository.save({ account_id: account._id, stream_id: event.stream_id, is_online: true });
-    }
+        if (is_online && isnt_same_stream) {
+            this.logger.debug(`Setting ${live.stream_id} LIVE to offline in database...`);
+            await this.live_repository.updateStatusById(live._id);
 
-    async setOfflineStatus(event: IEndMessage): Promise<void> {
-        const current_live: ILive | null = await this.live_repository.findOneByStreamId(event.stream_id);
-
-        if (current_live !== null) {
-            this.logger.debug(`Live ${event.stream_id} from ${event.owner_nickname} will be set offline`);
-            await this.live_repository.updateStatusById(current_live._id);
+            this.logger.debug(`Creating a new LIVE ${stream_id} for ${username} in database...`);
+            await this.live_repository.save({
+                stream_id,
+                account_id: account._id,
+                is_online
+            });
+        } else if (is_online && no_stream_found) {
+            this.logger.debug(`Creating a new LIVE ${stream_id} for ${username} in database...`);
+            await this.live_repository.save({
+                stream_id,
+                account_id: account._id,
+                is_online
+            });
+        } else if (!is_online && stream_found) {
+            this.logger.debug(`Setting ${live.stream_id} LIVE to offline in database...`);
+            await this.live_repository.updateStatusById(live._id);
+        } else {
+            this.logger.debug(`There's no need to update LIVE status for ${username}`);
         }
     }
 }

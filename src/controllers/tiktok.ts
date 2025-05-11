@@ -1,45 +1,38 @@
-// NestJS
-import { Controller, Logger } from "@nestjs/common";
-import { EventPattern } from "@nestjs/microservices";
-
-// Enums
-import { TiktokEvent } from "@enums/event";
-
-// Interfaces
-import { IChatMessage } from "@interfaces/chat-message";
-import { IOnlineMessage } from "@interfaces/online-message";
-import { IEndMessage } from "@interfaces/end-message";
-
-// Services
-import { LiveService } from "@services/live";
-
-// Core
 import { CommandResolver } from "@core/command-resolver";
+import { TiktokInputEvent } from "@enums/event";
+import { IChatMessage } from "@interfaces/chat-message";
+import { IEndMessage } from "@interfaces/end-message";
+import { IOnlineMessage } from "@interfaces/online-message";
+import { IOnlineStatusMessage } from "@interfaces/online-status.message";
+import { Controller } from "@nestjs/common";
+import { EventPattern, Payload } from "@nestjs/microservices";
+import { LiveService } from "@services/live";
 
 @Controller()
 export class TiktokController {
 
-    private readonly logger: Logger = new Logger(TiktokController.name);
-
-    constructor (
+    constructor(
         private readonly command_resolver: CommandResolver,
         private readonly live_service: LiveService
-    ) {}
+    ) { }
 
-    @EventPattern(TiktokEvent.ONLINE)
-    async isOnline(event: IOnlineMessage): Promise<void> {
-        this.logger.debug(`Account ${event.owner_nickname} is online`);
-        await this.live_service.setOnlineStatus(event);
+    @EventPattern(TiktokInputEvent.ONLINE_STATUS)
+    async isOnline(@Payload() message: IOnlineStatusMessage): Promise<void> {
+        this.live_service.setOnlineStatus(message.owner_username, message.is_online, message.room_info?.stream_id);
     }
 
-    @EventPattern(TiktokEvent.CHAT)
-    async receiveChat(event: IChatMessage): Promise<void> {
-        await this.command_resolver.resolve(event);
+    @EventPattern(TiktokInputEvent.ONLINE)
+    async onOnline(@Payload() message: IOnlineMessage): Promise<void> {
+        this.live_service.setOnlineStatus(message.owner_username, true, message.stream_id);
     }
 
-    @EventPattern(TiktokEvent.END)
-    async isOffline(event: IEndMessage): Promise<void> {
-        this.logger.debug(`Account ${event.owner_nickname} is offline`);
-        await this.live_service.setOfflineStatus(event);
+    @EventPattern(TiktokInputEvent.CHAT)
+    async onChat(@Payload() message: IChatMessage): Promise<void> {
+        await this.command_resolver.resolve(message);
+    }
+
+    @EventPattern(TiktokInputEvent.END)
+    async onEnd(@Payload() message: IEndMessage): Promise<void> {
+        this.live_service.setOnlineStatus(message.owner_username, false, message.stream_id);
     }
 }

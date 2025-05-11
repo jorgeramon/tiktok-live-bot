@@ -1,41 +1,26 @@
-// NestJS
+import { TiktokController } from '@controllers/tiktok';
+import { CommandResolver } from '@core/command-resolver';
+import { RequestResolver } from '@core/request-resolver';
+import { Startup } from '@core/startup';
+import { Environment, Microservice } from '@enums/environment';
+import { SocketGateway } from '@gateways/socket';
+import { AccountGuard } from '@guards/account';
+import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
-import { APP_GUARD } from '@nestjs/core';
-import { CacheModule } from '@nestjs/cache-manager';
+import { APP_FILTER, APP_GUARD } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-
-// Enums
-import { Environment } from '@enums/environment';
-
-// Controllers
-import { TiktokController } from '@controllers/tiktok';
-
-// Gateways
-import { SocketGateway } from '@gateways/socket';
-
-// Schemas
-import { Account, AccountSchema } from '@schemas/account';
-import { Live, LiveSchema } from '@schemas/live';
-import { Request, RequestSchema } from '@schemas/request';
-
-// Repositories
+import { MongooseModule } from '@nestjs/mongoose';
 import { AccountRepository } from '@repositories/account';
 import { LiveRepository } from '@repositories/live';
 import { RequestRepository } from '@repositories/request';
-
-// Services
-import { LiveService } from '@services/live';
+import { Account, AccountSchema } from '@schemas/account';
+import { Live, LiveSchema } from '@schemas/live';
+import { Request, RequestSchema } from '@schemas/request';
 import { CacheService } from '@services/cache';
-
-// Guards
-import { AccountGuard } from '@guards/account';
-
-// Core
-import { CommandResolver } from '@core/command-resolver';
-import { RequestResolver } from '@core/request-resolver';
+import { LiveService } from '@services/live';
+import { HandlerExceptionFilter } from 'exception-filters/handler';
 
 const CORE = [
   CommandResolver,
@@ -49,14 +34,19 @@ const REPOSITORIES = [
 ];
 
 const SERVICES = [
-  LiveService,
-  CacheService
+  Startup,
+  CacheService,
+  LiveService
 ];
 
-const GUARDS = [
+const INTERNAL = [
   {
     provide: APP_GUARD,
     useClass: AccountGuard,
+  },
+  {
+    provide: APP_FILTER,
+    useClass: HandlerExceptionFilter
   }
 ];
 
@@ -80,7 +70,7 @@ const GATEWAYS = [
       { name: Request.name, schema: RequestSchema },
     ]),
     ClientsModule.registerAsync([{
-      name: 'MESSAGE_BROKER',
+      name: Microservice.MESSAGE_BROKER,
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (configService: ConfigService) => ({
@@ -101,7 +91,7 @@ const GATEWAYS = [
     ...CORE,
     ...REPOSITORIES,
     ...SERVICES,
-    ...GUARDS,
+    ...INTERNAL,
     ...GATEWAYS
   ],
 })

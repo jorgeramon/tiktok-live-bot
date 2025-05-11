@@ -1,7 +1,11 @@
-export enum TiktokEvent {
+export enum TiktokInputEvent {
     ONLINE = 'tiktok.online',
     CHAT = 'tiktok.chat',
     END = 'tiktok.end',
+    ONLINE_STATUS = 'tiktok.online_status'
+}
+
+export enum TiktokOutputEvent {
     IS_ONLINE = 'tiktok.is_online'
 }
 

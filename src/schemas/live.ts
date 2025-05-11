@@ -1,11 +1,6 @@
-// NestJS
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-
-// Local
-import { Account } from './account';
-
-// NPM
 import { Document, Schema as MongooseSchema, Types } from 'mongoose';
+import { Account } from './account';
 
 @Schema({ timestamps: true, collection: 'lives' })
 export class Live {
@@ -14,7 +9,7 @@ export class Live {
     account_id: MongooseSchema.Types.ObjectId;
 
     @Prop({ required: true, unique: true })
-    stream_id: bigint;
+    stream_id: string;
 
     @Prop({ default: true })
     is_online: boolean;

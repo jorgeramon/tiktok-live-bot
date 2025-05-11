@@ -1,6 +1,3 @@
-// Local
-import { IMessage } from "./message";
+import { IMessage } from "@interfaces/message";
 
-export interface IEndMessage extends IMessage {
-
-}
+export interface IEndMessage extends IMessage { }

@@ -1,12 +1,9 @@
-// Local
-import { IMessage } from "./message";
+import { IMessage } from "@interfaces/message";
 
 export interface IChatMessage extends IMessage {
     comment: string;
-    user_nickname: string;
-    user_id: bigint;
-    user_picture: string;
-    is_moderator: boolean;
-    is_new_gifter: boolean;
-    is_subscriber: boolean;
+    user_id?: string;
+    user_username?: string;
+    user_nickname?: string;
+    user_picture?: string;
 }

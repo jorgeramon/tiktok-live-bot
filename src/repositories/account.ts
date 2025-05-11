@@ -23,8 +23,8 @@ export class AccountRepository {
         return documents.map(document => document.toJSON()) as IAccount[];
     }
 
-    async findOneByNickname(nickname: string): Promise<IAccount | null> {
-        const document: AccountDocument | null = await this.model.findOne({ nickname });
+    async findOneByUsername(username: string): Promise<IAccount | null> {
+        const document: AccountDocument | null = await this.model.findOne({ username });
         return document !== null ? document.toJSON() as IAccount : null;
     }
 

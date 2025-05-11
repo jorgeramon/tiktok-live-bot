@@ -1,25 +1,17 @@
-// NestJS
-import { Injectable, Logger } from "@nestjs/common";
-import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
-
-// Interfaces
+import { DefaultRequestConfig } from "@enums/default";
+import { RequestCommandEvent, RequestEvent } from "@enums/event";
+import { AccountOfflineException } from "@exceptions/account-offline";
+import { EmptyCommandArgumentException } from "@exceptions/empty-command-argument";
+import { MaximumRequestsReachedException } from "@exceptions/maximum-requests-reached";
+import { UnresolvableLiveException } from "@exceptions/unresolvable-live";
 import { ICommandEvent } from "@interfaces/command-event";
 import { ILive } from "@interfaces/live";
 import { IRequest } from "@interfaces/request";
-
-// Repositories
-import { RequestRepository } from "@repositories/request";
+import { Injectable, Logger } from "@nestjs/common";
+import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { LiveRepository } from "@repositories/live";
-
-// Enums
-import { RequestCommandEvent, RequestEvent } from "@enums/event";
-import { DefaultRequestConfig } from "@enums/default";
-
-// Exceptions
-import { AccountOfflineException } from "@exceptions/account-offline";
-import { UnresolvableLiveException } from "@exceptions/unresolvable-live";
-import { MaximumRequestsReachedException } from "@exceptions/maximum-requests-reached";
-import { EmptyCommandArgumentException } from "@exceptions/empty-command-argument";
+import { RequestRepository } from "@repositories/request";
+import { logException } from "@utils/log-exception";
 
 @Injectable()
 export class RequestResolver {
@@ -38,29 +30,29 @@ export class RequestResolver {
             const argument = event.argument.trim();
 
             if (!argument) {
-                throw new EmptyCommandArgumentException();
+                throw new EmptyCommandArgumentException(event.owner_username, event.stream_id, event.user_username);
             }
 
             const live: ILive | null = await this.live_repository.findOneByStreamId(event.stream_id);
 
             if (!live) {
-                throw new UnresolvableLiveException();
+                throw new UnresolvableLiveException(event.owner_username, event.stream_id);
             }
 
             if (!live.is_online) {
-                throw new AccountOfflineException();
+                throw new AccountOfflineException(event.owner_username, event.stream_id);
             }
 
             const current_requests: IRequest[] = await this.request_repository.findByLiveIdAndUserId(live._id, event.user_id);
 
             if (current_requests.length === DefaultRequestConfig.MAXIMUM_PER_ACCOUNT) {
-                throw new MaximumRequestsReachedException();
+                throw new MaximumRequestsReachedException(event.owner_username, event.stream_id, event.user_username);
             }
 
             const request: IRequest = await this.request_repository.save({
                 live_id: live._id,
                 user_id: event.user_id,
-                user_nickname: event.user_nickname,
+                user_username: event.user_username,
                 user_picture: event.user_picture,
                 request: event.argument
             });
@@ -70,15 +62,7 @@ export class RequestResolver {
                 request
             });
         } catch (err) {
-            if (err instanceof EmptyCommandArgumentException) {
-                this.logger.warn(`Live ${event.stream_id} ignored request due to being empty`);
-            } else if (err instanceof UnresolvableLiveException) {
-                this.logger.error(`Live ${event.stream_id} is not registered in database`);
-            } else if (err instanceof AccountOfflineException) {
-                this.logger.error(`Live ${event.stream_id} is offline`);
-            } else {
-                this.logger.error(`Unexpected error while processing a request: ${err.message}`);
-            }
+            logException(this.logger, err);
         }
     }
 }

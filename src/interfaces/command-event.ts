@@ -1,8 +1,10 @@
 export interface ICommandEvent {
     account_id: string;
-    user_id: bigint;
-    user_nickname: string;
+    owner_id: string;
+    owner_username: string;
+    user_id: string;
+    user_username: string;
     user_picture: string;
-    stream_id: bigint;
+    stream_id: string;
     argument: string;
 }

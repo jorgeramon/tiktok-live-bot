@@ -1,14 +1,7 @@
-// NestJS
+import { IRequest } from "@interfaces/request";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
-
-// Schemas
 import { Request, RequestDocument } from "@schemas/request";
-
-// Interfaces
-import { IRequest } from "@interfaces/request";
-
-// NPM
 import { Model } from "mongoose";
 
 @Injectable()
@@ -23,7 +16,7 @@ export class RequestRepository {
         return documents.map(document => document.toJSON()) as IRequest[];
     }
 
-    async findByLiveIdAndUserId(live_id: string, user_id: bigint): Promise<IRequest[]> {
+    async findByLiveIdAndUserId(live_id: string, user_id: string): Promise<IRequest[]> {
         const documents: RequestDocument[] = await this.model.find({ live_id, user_id });
         return documents.map(document => document.toJSON()) as IRequest[];
     }

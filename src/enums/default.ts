@@ -1,5 +1,5 @@
 export enum DefaultRequestConfig {
-    PREFIX = '!',
+    PREFIX = '',
     PLAY = 'hola',
     MAXIMUM_PER_ACCOUNT = 1
 }

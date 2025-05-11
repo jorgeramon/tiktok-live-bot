@@ -1,11 +1,6 @@
-// NestJS
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-
-// Local
+import { Document, Schema as MongooseSchema } from 'mongoose';
 import { Live } from './live';
-
-// NPM
-import { Document, Schema as MongooseSchema, Types } from 'mongoose';
 
 @Schema({ timestamps: true, collection: 'requests' })
 export class Request {
@@ -14,10 +9,10 @@ export class Request {
     live_id: MongooseSchema.Types.ObjectId;
 
     @Prop({ required: true })
-    user_id: bigint;
+    user_id: string;
 
     @Prop({ required: true })
-    user_nickname: string;
+    user_username: string;
 
     @Prop({ required: true })
     user_picture: string;
