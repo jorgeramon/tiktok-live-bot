@@ -4,7 +4,7 @@ import { AccountGuard } from "@guards/account";
 import { IChatMessage } from "@interfaces/chat-message";
 import { IEndMessage } from "@interfaces/end-message";
 import { IOnlineMessage } from "@interfaces/online-message";
-import { IOnlineStatusMessage } from "@interfaces/online-status.message";
+import { IOnlineStatusMessage } from "@interfaces/online-status-message";
 import { Controller, UseGuards } from "@nestjs/common";
 import { EventPattern, Payload } from "@nestjs/microservices";
 import { LiveService } from "@services/live";

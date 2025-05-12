@@ -19,7 +19,8 @@ export enum SocketEvent {
 }
 
 export enum SocketListenerEvent {
-    REQUEST_CREATED = 'request.created'
+    REQUEST_CREATED = 'request.created',
+    ONLINE_STATUS = 'online.status'
 }
 
 export enum CommandListenerEvent {

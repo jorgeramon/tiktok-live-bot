@@ -2,6 +2,7 @@ import { ErrorCode, SocketAcknowlegment, SocketEvent, SocketInputEvent, SocketLi
 import { UnresolvableSocketException } from "@exceptions/unresolvable-socket";
 import { SocketGuard } from "@guards/socket";
 import { ILive } from "@interfaces/live";
+import { IOnlineStatusEvent } from "@interfaces/online-status-event";
 import { IRequest } from "@interfaces/request";
 import { IRequestEvent } from "@interfaces/request-event";
 import { Logger, UseGuards } from "@nestjs/common";
@@ -50,22 +51,26 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @OnEvent(SocketListenerEvent.REQUEST_CREATED)
     async onRequest(event: IRequestEvent): Promise<void> {
         try {
-            const socket_id: string | null = await this.cache_service.getSocketIdByAccountId(event.account_id);
-
-            if (!socket_id) {
-                throw new UnresolvableSocketException(event.account_id);
-            }
-
-            const sockets: RemoteSocket<any, any>[] = await this.server.fetchSockets()
-            const socket: RemoteSocket<any, any> | undefined = sockets.find(s => s.id === socket_id);
-
-            if (!socket) {
-                throw new UnresolvableSocketException(event.account_id);
-            }
-
+            const socket: RemoteSocket<any, any> = await this.getSocket(event.account_id);
             const event_key: string = SocketOutputEvent.REQUEST_CREATED.replace('{account_id}', event.account_id);
-
             socket.emit(event_key, { ok: true, data: event.request });
+        } catch (err) {
+            logException(this.logger, err);
+        }
+    }
+
+    @OnEvent(SocketListenerEvent.ONLINE_STATUS)
+    async onStatus(event: IOnlineStatusEvent) {
+        try {
+            const socket: RemoteSocket<any, any> = await this.getSocket(event.account_id);
+            const event_key: string = SocketOutputEvent.GET_STATUS.replace('{account_id}', event.account_id);
+            socket.emit(event_key, {
+                ok: true,
+                data: {
+                    is_online: event.is_online,
+                    live: event.live
+                }
+            });
         } catch (err) {
             logException(this.logger, err);
         }
@@ -149,5 +154,22 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         });
 
         return SocketAcknowlegment.OK;
+    }
+
+    private async getSocket(account_id: string): Promise<RemoteSocket<any, any>> {
+        const socket_id: string | null = await this.cache_service.getSocketIdByAccountId(account_id);
+
+        if (!socket_id) {
+            throw new UnresolvableSocketException(account_id);
+        }
+
+        const sockets: RemoteSocket<any, any>[] = await this.server.fetchSockets()
+        const socket: RemoteSocket<any, any> | undefined = sockets.find(s => s.id === socket_id);
+
+        if (!socket) {
+            throw new UnresolvableSocketException(account_id);
+        }
+
+        return socket;
     }
 }
