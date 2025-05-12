@@ -41,12 +41,20 @@ export class LiveService {
                 is_online
             });
         } else if (is_online && no_stream_found) {
-            this.logger.debug(`Creating a new LIVE ${stream_id} for ${username} in database...`);
-            await this.live_repository.save({
-                stream_id,
-                account_id: account._id,
-                is_online
-            });
+            const existing_live: ILive | null = await this.live_repository.findOneByStreamId(stream_id!);
+
+            if (existing_live !== null) {
+                this.logger.debug(`Woops... seems like LIVE ${stream_id} from ${username} was offline in database...`);
+                await this.live_repository.updateStatusById(existing_live._id, true);
+            } else {
+                this.logger.debug(`Creating a new LIVE ${stream_id} for ${username} in database...`);
+
+                await this.live_repository.save({
+                    stream_id,
+                    account_id: account._id,
+                    is_online
+                });
+            }
         } else if (!is_online && stream_found) {
             this.logger.debug(`Setting ${live.stream_id} LIVE to offline in database...`);
             await this.live_repository.updateStatusById(live._id);
