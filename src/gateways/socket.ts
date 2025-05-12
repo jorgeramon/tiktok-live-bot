@@ -65,7 +65,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
             const event_key: string = SocketOutputEvent.REQUEST_CREATED.replace('{account_id}', event.account_id);
 
-            socket.emit(event_key, event.request);
+            socket.emit(event_key, { ok: true, data: event.request });
         } catch (err) {
             logException(this.logger, err);
         }
@@ -73,18 +73,18 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage(SocketInputEvent.GET_STATUS)
     async onQueryStatus(
-        @ConnectedSocket() client: Socket,
-        @MessageBody('account_id') account_id
+        @ConnectedSocket() client: Socket
     ): Promise<SocketAcknowlegment> {
-        this.logger.verbose(`${SocketInputEvent.GET_STATUS}: ${account_id}`);
-
+        const { account_id } = client.handshake.auth;
         const event_key: string = SocketOutputEvent.GET_STATUS.replace('{account_id}', account_id);
+
+        this.logger.verbose(`${SocketInputEvent.GET_STATUS} (${event_key})`);
 
         const live: ILive | null = await this.live_repository.findCurrentOnline(account_id);
 
         client.emit(event_key, {
             ok: true,
-            data: live
+            data: { is_online: live !== null, live }
         });
 
         return SocketAcknowlegment.OK;
@@ -92,20 +92,21 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
     @SubscribeMessage(SocketInputEvent.GET_REQUESTS)
     async onQueryRequests(
-        @ConnectedSocket() client: Socket,
-        @MessageBody('account_id') account_id: string
+        @ConnectedSocket() client: Socket
     ): Promise<SocketAcknowlegment> {
+        const { account_id } = client.handshake.auth;
         const event_key: string = SocketOutputEvent.GET_REQUESTS.replace('{account_id}', account_id);
 
-        this.logger.verbose(`${SocketInputEvent.GET_REQUESTS}: ${account_id} => ${event_key}`);
+        this.logger.verbose(`${SocketInputEvent.GET_REQUESTS} (${event_key})`);
 
         const live: ILive | null = await this.live_repository.findCurrentOnline(account_id);
 
         if (!live) {
             client.emit(event_key, {
-                error: true,
+                ok: false,
                 code: ErrorCode.USER_OFFLINE
             });
+
             return SocketAcknowlegment.ERROR;
         }
 
@@ -114,6 +115,37 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         client.emit(event_key, {
             ok: true,
             data: requests
+        });
+
+        return SocketAcknowlegment.OK;
+    }
+
+    @SubscribeMessage(SocketInputEvent.COMPLETE_REQUEST)
+    async onCompleteRequest(
+        @ConnectedSocket() client: Socket,
+        @MessageBody('request_id') request_id: string
+    ): Promise<SocketAcknowlegment> {
+        const { account_id } = client.handshake.auth;
+        const event_key: string = SocketOutputEvent.REQUEST_COMPLETED.replace('{account_id}', account_id);
+
+        this.logger.verbose(`${SocketInputEvent.COMPLETE_REQUEST} (${account_id} - ${request_id})`);
+
+        const live: ILive | null = await this.live_repository.findCurrentOnline(account_id);
+
+        if (!live) {
+            client.emit(event_key, {
+                error: true,
+                code: ErrorCode.USER_OFFLINE
+            });
+
+            return SocketAcknowlegment.ERROR;
+        }
+
+        await this.request_repository.completeById(request_id);
+
+        client.emit(event_key, {
+            ok: true,
+            data: request_id
         });
 
         return SocketAcknowlegment.OK;

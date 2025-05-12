@@ -2,7 +2,7 @@ import { ILive } from "@interfaces/live";
 import { Injectable } from "@nestjs/common";
 import { InjectModel } from "@nestjs/mongoose";
 import { Live, LiveDocument } from "@schemas/live";
-import { Model } from "mongoose";
+import { Model, Types } from "mongoose";
 
 @Injectable()
 export class LiveRepository {
@@ -22,7 +22,7 @@ export class LiveRepository {
     }
 
     async findCurrentOnline(account_id: string): Promise<ILive | null> {
-        const document: LiveDocument | null = await this.model.findOne({ account_id, is_online: true });
+        const document: LiveDocument | null = await this.model.findOne({ account_id: new Types.ObjectId(account_id), is_online: true });
         return document !== null ? document.toJSON() as ILive : null;
     }
 

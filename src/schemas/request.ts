@@ -15,10 +15,19 @@ export class Request {
     user_username: string;
 
     @Prop({ required: true })
+    user_nickname: string;
+
+    @Prop({ required: true })
     user_picture: string;
 
     @Prop({ required: true })
     request: string;
+
+    @Prop({ default: false })
+    completed: boolean;
+
+    @Prop({ default: false })
+    current: boolean;
 }
 
 export const RequestSchema =

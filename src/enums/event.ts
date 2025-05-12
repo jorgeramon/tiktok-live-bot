@@ -28,13 +28,15 @@ export enum CommandListenerEvent {
 
 export enum SocketInputEvent {
     GET_STATUS = 'get.status',
-    GET_REQUESTS = 'get.requests'
+    GET_REQUESTS = 'get.requests',
+    COMPLETE_REQUEST = 'complete.request'
 }
 
 export enum SocketOutputEvent {
     GET_REQUESTS = '{account_id}.requests',
     GET_STATUS = '{account_id}.status',
-    REQUEST_CREATED = '{account_id}.request'
+    REQUEST_CREATED = '{account_id}.request',
+    REQUEST_COMPLETED = '{account_id}.request.completed'
 }
 
 export enum SocketAcknowlegment {

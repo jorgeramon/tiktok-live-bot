@@ -37,6 +37,7 @@ export class CommandResolver {
                 owner_username: message.owner_username,
                 user_id: message.user_id,
                 user_username: message.user_username,
+                user_nickname: message.user_nickname,
                 user_picture: message.user_picture,
                 stream_id: message.stream_id,
                 argument: normalized_comment.replace(command, '').trim()

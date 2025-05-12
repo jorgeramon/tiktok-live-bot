@@ -53,6 +53,7 @@ export class CommandListener {
                 live_id: live._id,
                 user_id: event.user_id,
                 user_username: event.user_username,
+                user_nickname: event.user_nickname,
                 user_picture: event.user_picture,
                 request: event.argument
             });
