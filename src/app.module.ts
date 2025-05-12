@@ -1,14 +1,14 @@
 import { TiktokController } from '@controllers/tiktok';
 import { CommandResolver } from '@core/command-resolver';
-import { RequestResolver } from '@core/request-resolver';
 import { Startup } from '@core/startup';
 import { Environment, Microservice } from '@enums/environment';
 import { SocketGateway } from '@gateways/socket';
-import { AccountGuard } from '@guards/account';
+import { CacheListener } from '@listeners/cache';
+import { CommandListener } from '@listeners/command';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER, APP_GUARD } from '@nestjs/core';
+import { APP_FILTER } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -24,7 +24,6 @@ import { HandlerExceptionFilter } from 'exception-filters/handler';
 
 const CORE = [
   CommandResolver,
-  RequestResolver,
 ];
 
 const REPOSITORIES = [
@@ -41,18 +40,20 @@ const SERVICES = [
 
 const INTERNAL = [
   {
-    provide: APP_GUARD,
-    useClass: AccountGuard,
-  },
-  {
     provide: APP_FILTER,
     useClass: HandlerExceptionFilter
   }
 ];
 
 const GATEWAYS = [
-  SocketGateway
+  SocketGateway,
+
 ];
+
+const LISTENERS = [
+  CommandListener,
+  CacheListener
+]
 
 @Module({
   imports: [
@@ -92,7 +93,8 @@ const GATEWAYS = [
     ...REPOSITORIES,
     ...SERVICES,
     ...INTERNAL,
-    ...GATEWAYS
+    ...GATEWAYS,
+    ...LISTENERS
   ],
 })
 export class AppModule { }

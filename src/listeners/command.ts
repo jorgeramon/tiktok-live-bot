@@ -1,5 +1,5 @@
 import { DefaultRequestConfig } from "@enums/default";
-import { RequestCommandEvent, RequestEvent } from "@enums/event";
+import { CommandListenerEvent, SocketListenerEvent } from "@enums/event";
 import { AccountOfflineException } from "@exceptions/account-offline";
 import { EmptyCommandArgumentException } from "@exceptions/empty-command-argument";
 import { MaximumRequestsReachedException } from "@exceptions/maximum-requests-reached";
@@ -14,9 +14,9 @@ import { RequestRepository } from "@repositories/request";
 import { logException } from "@utils/log-exception";
 
 @Injectable()
-export class RequestResolver {
+export class CommandListener {
 
-    private readonly logger: Logger = new Logger(RequestResolver.name);
+    private readonly logger: Logger = new Logger(CommandListener.name);
 
     constructor(
         private readonly request_repository: RequestRepository,
@@ -24,7 +24,7 @@ export class RequestResolver {
         private readonly event_emitter: EventEmitter2
     ) { }
 
-    @OnEvent(RequestCommandEvent.PLAY)
+    @OnEvent(CommandListenerEvent.REQUEST_PLAY)
     async onPlay(event: ICommandEvent): Promise<void> {
         try {
             const argument = event.argument.trim();
@@ -57,7 +57,7 @@ export class RequestResolver {
                 request: event.argument
             });
 
-            this.event_emitter.emit(RequestEvent.CREATED, {
+            this.event_emitter.emit(SocketListenerEvent.REQUEST_CREATED, {
                 account_id: event.account_id,
                 request
             });

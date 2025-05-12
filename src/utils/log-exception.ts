@@ -5,9 +5,10 @@ import { MaximumRequestsReachedException } from "@exceptions/maximum-requests-re
 import { RuntimeException } from "@exceptions/runtime";
 import { UnresolvableAccountException } from "@exceptions/unresolvable-account";
 import { UnresolvableLiveException } from "@exceptions/unresolvable-live";
+import { UnresolvableSocketException } from "@exceptions/unresolvable-socket";
 import { Logger } from "@nestjs/common";
 
-export function logException(logger: Logger, exception: RuntimeException) {
+export function logException(logger: Logger, exception: Error) {
     if (exception instanceof AccountOfflineException) {
         const runtime_exception = exception as AccountOfflineException;
         logger.warn(`LIVE ${runtime_exception.stream_id} from ${runtime_exception.owner_username} is offline in database`);
@@ -26,8 +27,14 @@ export function logException(logger: Logger, exception: RuntimeException) {
     } else if (exception instanceof UnresolvableLiveException) {
         const runtime_exception = exception as UnresolvableLiveException;
         logger.warn(`Unresolvable ${runtime_exception.stream_id} LIVE from ${runtime_exception.owner_username} in database`);
-    } else {
+    } else if (exception instanceof UnresolvableSocketException) {
+        const runtime_exception = exception as UnresolvableSocketException;
+        logger.warn(`Unresolvable socket for ${runtime_exception.account_id}`);
+    } else if (exception instanceof RuntimeException) {
         logger.error(`Unexpected runtime exception caught: ${exception.message}`);
         logger.error(exception.stack);
+    } else {
+        logger.fatal(`Unknown error caught: ${exception.message}`);
+        logger.fatal(exception.stack);
     }
 }

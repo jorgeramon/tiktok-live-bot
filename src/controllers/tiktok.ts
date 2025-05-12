@@ -1,13 +1,15 @@
 import { CommandResolver } from "@core/command-resolver";
 import { TiktokInputEvent } from "@enums/event";
+import { AccountGuard } from "@guards/account";
 import { IChatMessage } from "@interfaces/chat-message";
 import { IEndMessage } from "@interfaces/end-message";
 import { IOnlineMessage } from "@interfaces/online-message";
 import { IOnlineStatusMessage } from "@interfaces/online-status.message";
-import { Controller } from "@nestjs/common";
+import { Controller, UseGuards } from "@nestjs/common";
 import { EventPattern, Payload } from "@nestjs/microservices";
 import { LiveService } from "@services/live";
 
+@UseGuards(AccountGuard)
 @Controller()
 export class TiktokController {
 

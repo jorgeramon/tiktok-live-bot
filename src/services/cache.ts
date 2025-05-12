@@ -1,8 +1,6 @@
-import { AccountEvent } from "@enums/event";
 import { IAccount } from "@interfaces/account";
 import { Cache, CACHE_MANAGER } from "@nestjs/cache-manager";
 import { Inject, Injectable, OnApplicationBootstrap } from "@nestjs/common";
-import { OnEvent } from "@nestjs/event-emitter";
 import { AccountRepository } from "@repositories/account";
 import { CacheUtils } from "@utils/cache-utils";
 
@@ -18,12 +16,6 @@ export class CacheService implements OnApplicationBootstrap {
         await this.loadAccounts();
     }
 
-    @OnEvent(AccountEvent.CREATED)
-    async onAccountCreated(account: IAccount): Promise<void> {
-        const accounts: IAccount[] = await this.getAccounts();
-        await this.cache_manager.set<IAccount[]>(CacheUtils.ACCOUNTS_KEY(), [...accounts, account]);
-    }
-
     async getAccounts(): Promise<IAccount[]> {
         const cache_accounts: IAccount[] | null = await this.cache_manager.get<IAccount[]>(CacheUtils.ACCOUNTS_KEY());
         return cache_accounts ?? [];
@@ -32,6 +24,10 @@ export class CacheService implements OnApplicationBootstrap {
     async getAccountByUsername(username: string): Promise<IAccount | null> {
         const cache_accounts: IAccount[] = await this.getAccounts();
         return cache_accounts.find(account => account.username === username) ?? null;
+    }
+
+    getSocketIdByAccountId(account_id: string): Promise<string | null> {
+        return this.cache_manager.get<string>(CacheUtils.SOCKET_KEY(account_id));
     }
 
     private async loadAccounts(): Promise<void> {

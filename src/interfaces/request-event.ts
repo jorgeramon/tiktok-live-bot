@@ -1,5 +1,4 @@
-// Local
-import { IRequest } from "./request";
+import { IRequest } from "@interfaces/request";
 
 export interface IRequestEvent {
     account_id: string;

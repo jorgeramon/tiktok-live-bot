@@ -18,17 +18,42 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@controllers/*": ["./controllers/*"],
-      "@gateways/*": ["./gateways/*"],
-      "@interfaces/*": ["./interfaces/*"],
-      "@schemas/*": ["./schemas/*"],
-      "@repositories/*": ["./repositories/*"],
-      "@services/*": ["./services/*"],
-      "@guards/*": ["./guards/*"],
-      "@enums/*": ["./enums/*"],
-      "@core/*": ["./core/*"],
-      "@utils/*": ["./utils/*"],
-      "@exceptions/*": ["./exceptions/*"],
+      "@controllers/*": [
+        "./controllers/*"
+      ],
+      "@gateways/*": [
+        "./gateways/*"
+      ],
+      "@interfaces/*": [
+        "./interfaces/*"
+      ],
+      "@schemas/*": [
+        "./schemas/*"
+      ],
+      "@repositories/*": [
+        "./repositories/*"
+      ],
+      "@services/*": [
+        "./services/*"
+      ],
+      "@guards/*": [
+        "./guards/*"
+      ],
+      "@enums/*": [
+        "./enums/*"
+      ],
+      "@core/*": [
+        "./core/*"
+      ],
+      "@utils/*": [
+        "./utils/*"
+      ],
+      "@exceptions/*": [
+        "./exceptions/*"
+      ],
+      "@listeners/*": [
+        "./listeners/*"
+      ]
     }
   }
 }

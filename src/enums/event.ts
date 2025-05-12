@@ -9,26 +9,32 @@ export enum TiktokOutputEvent {
     IS_ONLINE = 'tiktok.is_online'
 }
 
-export enum AccountEvent {
-    CREATED = 'account.created'
+export enum DatabaseEvent {
+    ACCOUNT_CREATED = 'account.created'
 }
 
-export enum RequestEvent {
-    CREATED = 'request.created'
+export enum SocketEvent {
+    CONNECTED = 'socket.connect',
+    DISCONNECTED = 'socket.disconnected'
 }
 
-export enum RequestCommandEvent {
-    PLAY = 'request.play'
+export enum SocketListenerEvent {
+    REQUEST_CREATED = 'request.created'
 }
 
-export enum SocketRequestEvent {
+export enum CommandListenerEvent {
+    REQUEST_PLAY = 'request.play'
+}
+
+export enum SocketInputEvent {
     GET_STATUS = 'get.status',
     GET_REQUESTS = 'get.requests'
 }
 
-export enum SocketResponseEvent {
-    REQUESTS = '{account_id}.requests',
-    STATUS = '{account_id}.status'
+export enum SocketOutputEvent {
+    GET_REQUESTS = '{account_id}.requests',
+    GET_STATUS = '{account_id}.status',
+    REQUEST_CREATED = '{account_id}.request'
 }
 
 export enum SocketAcknowlegment {
