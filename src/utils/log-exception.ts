@@ -16,11 +16,9 @@ export function logException(logger: Logger, exception: Error) {
         const runtime_exception = exception as EmptyCommandArgumentException;
         logger.warn(`No command arguments were given by ${runtime_exception.user_username} in LIVE ${runtime_exception.stream_id} from ${runtime_exception.owner_username}`);
     } else if (exception instanceof EmptyCommentException) {
-        const runtime_exception = exception as EmptyCommandArgumentException;
-        logger.warn(`Empty command given by ${runtime_exception.user_username} in LIVE ${runtime_exception.stream_id} from ${runtime_exception.owner_username}`);
+        logger.warn(`Empty command`);
     } else if (exception instanceof MaximumRequestsReachedException) {
-        const runtime_exception = exception as EmptyCommandArgumentException;
-        logger.warn(`Empty command given by ${runtime_exception.user_username} in LIVE ${runtime_exception.stream_id} from ${runtime_exception.owner_username}`);
+        logger.warn(`Maximum reached`);
     } else if (exception instanceof UnresolvableAccountException) {
         const runtime_exception = exception as UnresolvableAccountException;
         logger.warn(`Unresolvable ${runtime_exception.owner_username} account in database`);

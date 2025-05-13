@@ -27,6 +27,8 @@ export class CommandListener {
     @OnEvent(CommandListenerEvent.REQUEST_PLAY)
     async onPlay(event: ICommandEvent): Promise<void> {
         try {
+            this.logger.verbose(event);
+
             const argument = event.argument.trim();
 
             if (!argument) {

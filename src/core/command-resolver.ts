@@ -22,6 +22,7 @@ export class CommandResolver {
         const account: IAccount | null = await this.cache_service.getAccountByUsername(message.owner_username);
 
         if (!message.comment) {
+            this.logger.verbose(message);
             throw new EmptyCommentException();
         }
 
@@ -32,8 +33,6 @@ export class CommandResolver {
         const command = `${DefaultRequestConfig.PREFIX}${DefaultRequestConfig.PLAY}`;
 
         const normalized_comment = message.comment.trim().toLowerCase();
-
-        this.logger.verbose(`Comment: ${normalized_comment}`);
 
         if (normalized_comment.startsWith(command)) {
             this.logger.verbose(`${message.user_nickname} entered command with comment "${normalized_comment}"`);
@@ -47,7 +46,7 @@ export class CommandResolver {
                 user_nickname: message.user_nickname,
                 user_picture: message.user_picture,
                 stream_id: message.stream_id,
-                argument: normalized_comment.slice(0, command.length)
+                argument: normalized_comment.slice(command.length)
             });
         }
     }
