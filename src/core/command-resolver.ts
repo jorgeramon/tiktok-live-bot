@@ -35,8 +35,6 @@ export class CommandResolver {
         const normalized_comment = message.comment.trim().toLowerCase();
 
         if (normalized_comment.startsWith(command)) {
-            this.logger.verbose(`${message.user_nickname} entered command with comment "${normalized_comment}"`);
-
             this.event_emitter.emit(CommandListenerEvent.REQUEST_PLAY, {
                 account_id: account._id,
                 owner_id: message.owner_id,

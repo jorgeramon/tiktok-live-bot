@@ -32,7 +32,6 @@ export class CommandListener {
             const argument = event.argument.trim();
 
             if (!argument) {
-                this.logger.verbose(`No Argument: ${argument}`);
                 throw new EmptyCommandArgumentException(event.owner_username, event.stream_id, event.user_username);
             }
 
@@ -60,8 +59,6 @@ export class CommandListener {
                 user_picture: event.user_picture,
                 request: event.argument
             });
-
-            this.logger.verbose(`Sending request to socket: ${request.request}`);
 
             this.event_emitter.emit(SocketListenerEvent.REQUEST_CREATED, {
                 account_id: event.account_id,
