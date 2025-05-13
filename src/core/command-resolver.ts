@@ -47,7 +47,8 @@ export class CommandResolver {
                 user_nickname: message.user_nickname,
                 user_picture: message.user_picture,
                 stream_id: message.stream_id,
-                argument: normalized_comment
-            }
+                argument: normalized_comment.slice(0, command.length)
+            });
+        }
     }
-    }
+}
