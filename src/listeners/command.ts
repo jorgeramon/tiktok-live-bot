@@ -30,6 +30,7 @@ export class CommandListener {
             const argument = event.argument.trim();
 
             if (!argument) {
+                this.logger.verbose(`No Argument: ${argument}`);
                 throw new EmptyCommandArgumentException(event.owner_username, event.stream_id, event.user_username);
             }
 

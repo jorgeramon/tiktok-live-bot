@@ -48,7 +48,6 @@ export class CommandResolver {
                 user_picture: message.user_picture,
                 stream_id: message.stream_id,
                 argument: normalized_comment
-            });
-        }
+            }
     }
-}
+    }
