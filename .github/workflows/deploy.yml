@@ -17,5 +17,6 @@ jobs:
             cd tiktok-live-bot
             git pull origin master
             yarn install
+            rm dist
             yarn build
             pm2 restart pm2.yml
