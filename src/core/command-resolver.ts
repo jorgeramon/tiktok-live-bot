@@ -4,12 +4,14 @@ import { EmptyCommentException } from "@exceptions/empty-comment";
 import { UnresolvableAccountException } from "@exceptions/unresolvable-account";
 import { IAccount } from "@interfaces/account";
 import { IChatMessage } from "@interfaces/chat-message";
-import { Injectable } from "@nestjs/common";
+import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { CacheService } from "@services/cache";
 
 @Injectable()
 export class CommandResolver {
+
+    private readonly logger: Logger = new Logger(CommandResolver.name);
 
     constructor(
         private readonly cache_service: CacheService,
@@ -28,7 +30,12 @@ export class CommandResolver {
         }
 
         const command = `${DefaultRequestConfig.PREFIX}${DefaultRequestConfig.PLAY}`;
+
+        this.logger.verbose(`Command: ${command}`);
+
         const normalized_comment = message.comment.trim().toLowerCase();
+
+        this.logger.verbose(`Comment: ${normalized_comment}`);
 
         if (normalized_comment.startsWith(command)) {
             this.event_emitter.emit(CommandListenerEvent.REQUEST_PLAY, {
