@@ -58,6 +58,8 @@ export class CommandListener {
                 request: event.argument
             });
 
+            this.logger.verbose(`Sending request to socket: ${request.request}`);
+
             this.event_emitter.emit(SocketListenerEvent.REQUEST_CREATED, {
                 account_id: event.account_id,
                 request
