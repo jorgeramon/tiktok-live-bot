@@ -36,7 +36,7 @@ export class CommandResolver {
         this.logger.verbose(`Comment: ${normalized_comment}`);
 
         if (normalized_comment.startsWith(command)) {
-            this.logger.verbose(`${message.user_nickname} entered command ${command}`);
+            this.logger.verbose(`${message.user_nickname} entered command with comment "${normalized_comment}"`);
 
             this.event_emitter.emit(CommandListenerEvent.REQUEST_PLAY, {
                 account_id: account._id,
@@ -47,7 +47,7 @@ export class CommandResolver {
                 user_nickname: message.user_nickname,
                 user_picture: message.user_picture,
                 stream_id: message.stream_id,
-                argument: normalized_comment.slice(0, command.length)
+                argument: normalized_comment
             });
         }
     }
