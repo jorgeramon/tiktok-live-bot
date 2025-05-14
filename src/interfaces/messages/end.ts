@@ -1,3 +1,3 @@
-import { IMessage } from "@interfaces/messages/message";
+import { IMessage } from '@/interfaces/messages/message';
 
-export interface IEndMessage extends IMessage { }
+export interface IEndMessage extends IMessage {}

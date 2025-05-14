@@ -1,3 +1,3 @@
-import { RuntimeException } from "@exceptions/runtime";
+import { RuntimeException } from '@/exceptions/runtime';
 
-export class EmptyCommentException extends RuntimeException { }
+export class EmptyCommentException extends RuntimeException {}

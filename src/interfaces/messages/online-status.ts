@@ -1,7 +1,7 @@
-import { IOnlineMessage } from "@interfaces/messages/online";
+import { IOnlineMessage } from '@/interfaces/messages/online';
 
 export interface IOnlineStatusMessage {
-    owner_username: string;
-    is_online: boolean;
-    room_info: IOnlineMessage;
+  owner_username: string;
+  is_online: boolean;
+  room_info: IOnlineMessage;
 }

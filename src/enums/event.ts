@@ -1,53 +1,53 @@
 export enum TiktokInputEvent {
-    ONLINE = 'tiktok.online',
-    CHAT = 'tiktok.chat',
-    END = 'tiktok.end',
-    ONLINE_STATUS = 'tiktok.online_status'
+  ONLINE = 'tiktok.online',
+  CHAT = 'tiktok.chat',
+  END = 'tiktok.end',
+  ONLINE_STATUS = 'tiktok.online_status',
 }
 
 export enum TiktokOutputEvent {
-    IS_ONLINE = 'tiktok.is_online'
+  IS_ONLINE = 'tiktok.is_online',
 }
 
 export enum DatabaseEvent {
-    ACCOUNT_CREATED = 'account.created'
+  ACCOUNT_CREATED = 'account.created',
 }
 
 export enum SocketEvent {
-    CONNECTED = 'socket.connect',
-    DISCONNECTED = 'socket.disconnected'
+  CONNECTED = 'socket.connect',
+  DISCONNECTED = 'socket.disconnected',
 }
 
 export enum SocketListenerEvent {
-    REQUEST_CREATED = 'request.created',
-    REQUEST_UPDATED = 'request.updated',
-    ONLINE_STATUS = 'online.status'
+  REQUEST_CREATED = 'request.created',
+  REQUEST_UPDATED = 'request.updated',
+  ONLINE_STATUS = 'online.status',
 }
 
 export enum CommandListenerEvent {
-    REQUEST_PLAY = 'request.play'
+  REQUEST_PLAY = 'request.play',
 }
 
 export enum SocketInputEvent {
-    GET_STATUS = 'get.status',
-    GET_REQUESTS = 'get.requests',
-    COMPLETE_REQUEST = 'complete.request'
+  GET_STATUS = 'get.status',
+  GET_REQUESTS = 'get.requests',
+  COMPLETE_REQUEST = 'complete.request',
 }
 
 export enum SocketOutputEvent {
-    GET_REQUESTS = '{account_id}.requests',
-    GET_STATUS = '{account_id}.status',
-    REQUEST_CREATED = '{account_id}.request.created',
-    REQUEST_UPDATED = '{account_id}.request.updated',
-    REQUEST_COMPLETED = '{account_id}.request.completed'
+  GET_REQUESTS = '{account_id}.requests',
+  GET_STATUS = '{account_id}.status',
+  REQUEST_CREATED = '{account_id}.request.created',
+  REQUEST_UPDATED = '{account_id}.request.updated',
+  REQUEST_COMPLETED = '{account_id}.request.completed',
 }
 
 export enum SocketAcknowlegment {
-    OK = 'ok',
-    ERROR = 'error'
+  OK = 'ok',
+  ERROR = 'error',
 }
 
 export enum ErrorCode {
-    USER_OFFLINE = 'user_offline_error',
-    REQUEST_NOT_FOUND = 'request_not_found'
+  USER_OFFLINE = 'user_offline_error',
+  REQUEST_NOT_FOUND = 'request_not_found',
 }
