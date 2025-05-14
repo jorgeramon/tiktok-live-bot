@@ -7,6 +7,5 @@ export interface IRequestCreatedEvent {
 
 export interface IRequestUpdatedEvent {
     account_id: string;
-    request_id: string;
-    new_request: string;
+    request: IRequest
 }

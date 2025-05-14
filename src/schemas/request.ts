@@ -28,6 +28,12 @@ export class Request {
 
     @Prop({ default: false })
     current: boolean;
+
+    @Prop({ required: true })
+    requested_at: Date;
+
+    @Prop()
+    completed_at: Date;
 }
 
 export const RequestSchema =

@@ -49,12 +49,11 @@ export class CommandListener {
 
                 this.logger.verbose(`${event.account_id}: Updating request "${request._id}" from "${request.request}" to "${argument}"`);
 
-                await this.request_repository.update(request._id, { request: argument });
+                const updated_request: IRequest | null = await this.request_repository.update(request._id, { request: argument });
 
                 this.event_emitter.emit(SocketListenerEvent.REQUEST_UPDATED, {
                     account_id: event.account_id,
-                    request_id: request._id,
-                    new_request: argument
+                    request: updated_request!
                 });
             } else {
                 this.logger.verbose(`${event.account_id}: Creating new request "${argument}"`);
@@ -65,7 +64,8 @@ export class CommandListener {
                     user_username: event.user_username,
                     user_nickname: event.user_nickname,
                     user_picture: event.user_picture,
-                    request: event.argument
+                    request: event.argument,
+                    requested_at: new Date()
                 });
 
                 this.event_emitter.emit(SocketListenerEvent.REQUEST_CREATED, {

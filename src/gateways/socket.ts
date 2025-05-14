@@ -53,6 +53,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             const client: RemoteSocket<any, any> = await this.getSocket(event.account_id);
             const event_key: string = SocketOutputEvent.REQUEST_CREATED.replace('{account_id}', event.account_id);
+
             client.emit(event_key, {
                 ok: true,
                 data: event.request
@@ -67,12 +68,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             const client: RemoteSocket<any, any> = await this.getSocket(event.account_id);
             const event_key: string = SocketOutputEvent.REQUEST_UPDATED.replace('{account_id}', event.account_id);
+
             client.emit(event_key, {
                 ok: true,
-                data: {
-                    request_id: event.request_id,
-                    new_request: event.new_request
-                }
+                data: event.request
             });
         } catch (err) {
             logException(this.logger, err);
@@ -84,6 +83,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         try {
             const client: RemoteSocket<any, any> = await this.getSocket(event.account_id);
             const event_key: string = SocketOutputEvent.GET_STATUS.replace('{account_id}', event.account_id);
+
             client.emit(event_key, {
                 ok: true,
                 data: {
@@ -102,9 +102,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ): Promise<SocketAcknowlegment> {
         const { account_id } = client.handshake.auth;
         const event_key: string = SocketOutputEvent.GET_STATUS.replace('{account_id}', account_id);
-
-        this.logger.verbose(`${SocketInputEvent.GET_STATUS} (${event_key})`);
-
         const live: ILive | null = await this.live_repository.findCurrentOnline(account_id);
 
         client.emit(event_key, {
@@ -124,9 +121,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     ): Promise<SocketAcknowlegment> {
         const { account_id } = client.handshake.auth;
         const event_key: string = SocketOutputEvent.GET_REQUESTS.replace('{account_id}', account_id);
-
-        this.logger.verbose(`${SocketInputEvent.GET_REQUESTS} (${event_key})`);
-
         const live: ILive | null = await this.live_repository.findCurrentOnline(account_id);
 
         if (!live) {
@@ -156,8 +150,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         const { account_id } = client.handshake.auth;
         const event_key: string = SocketOutputEvent.REQUEST_COMPLETED.replace('{account_id}', account_id);
 
-        this.logger.verbose(`${SocketInputEvent.COMPLETE_REQUEST} (${account_id} - ${request_id})`);
-
         const live: ILive | null = await this.live_repository.findCurrentOnline(account_id);
 
         if (!live) {
@@ -169,14 +161,26 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return SocketAcknowlegment.ERROR;
         }
 
-        await this.request_repository.update(request_id, { completed: true });
-
-        client.emit(event_key, {
-            ok: true,
-            data: request_id
+        const updated_request: IRequest | null = await this.request_repository.update(request_id, {
+            completed: true,
+            completed_at: new Date()
         });
 
-        return SocketAcknowlegment.OK;
+        if (updated_request !== null) {
+            client.emit(event_key, {
+                ok: true,
+                data: updated_request
+            });
+
+            return SocketAcknowlegment.OK;
+        } else {
+            client.emit(event_key, {
+                ok: false,
+                code: ErrorCode.REQUEST_NOT_FOUND
+            });
+
+            return SocketAcknowlegment.ERROR;
+        }
     }
 
     private async getSocket(account_id: string): Promise<RemoteSocket<any, any>> {

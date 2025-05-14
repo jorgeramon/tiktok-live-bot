@@ -8,4 +8,6 @@ export interface IRequest {
     request: string;
     completed: boolean;
     current: boolean;
+    requested_at: Date;
+    completed_at: Date;
 }

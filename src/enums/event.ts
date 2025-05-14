@@ -48,5 +48,6 @@ export enum SocketAcknowlegment {
 }
 
 export enum ErrorCode {
-    USER_OFFLINE = 'user_offline_error'
+    USER_OFFLINE = 'user_offline_error',
+    REQUEST_NOT_FOUND = 'request_not_found'
 }
