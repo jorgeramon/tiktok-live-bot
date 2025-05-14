@@ -21,12 +21,13 @@ import { APP_FILTER } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
+import { SocketEventService } from './services/socket-event';
 
 const CORE = [CommandResolver];
 
 const REPOSITORIES = [AccountRepository, LiveRepository, RequestRepository];
 
-const SERVICES = [Startup, CacheService, LiveService];
+const SERVICES = [Startup, CacheService, LiveService, SocketEventService];
 
 const INTERNAL = [
   {

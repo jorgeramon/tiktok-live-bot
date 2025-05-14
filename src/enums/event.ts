@@ -32,6 +32,7 @@ export enum SocketInputEvent {
   GET_STATUS = 'get.status',
   GET_REQUESTS = 'get.requests',
   COMPLETE_REQUEST = 'complete.request',
+  SELECT_REQUEST = 'select.request',
 }
 
 export enum SocketOutputEvent {
@@ -40,6 +41,7 @@ export enum SocketOutputEvent {
   REQUEST_CREATED = '{account_id}.request.created',
   REQUEST_UPDATED = '{account_id}.request.updated',
   REQUEST_COMPLETED = '{account_id}.request.completed',
+  REQUEST_SELECTED = '{account_id}.request.selected',
 }
 
 export enum SocketAcknowlegment {
@@ -49,5 +51,6 @@ export enum SocketAcknowlegment {
 
 export enum ErrorCode {
   USER_OFFLINE = 'user_offline_error',
-  REQUEST_NOT_FOUND = 'request_not_found',
+  REQUEST_NOT_FOUND = 'request_not_found_error',
+  UNKNOWN = 'unknown_error',
 }

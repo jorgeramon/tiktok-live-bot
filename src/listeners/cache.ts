@@ -1,9 +1,7 @@
 import { DatabaseEvent, SocketEvent } from '@/enums/event';
 import { IAccount } from '@/interfaces/account';
-import {
-  IConnectedSocketEvent,
-  IDisconnectedSocketEvent,
-} from '@/interfaces/events/socket';
+import { IConnectedSocketEvent } from '@/interfaces/events/connected-socket';
+import { IDisconnectedSocketEvent } from '@/interfaces/events/disconnected-socket';
 import { CacheUtils } from '@/utils/cache-utils';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
 import { Inject, Injectable, Logger } from '@nestjs/common';

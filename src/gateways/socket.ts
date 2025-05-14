@@ -1,5 +1,4 @@
 import {
-  ErrorCode,
   SocketAcknowlegment,
   SocketEvent,
   SocketInputEvent,
@@ -13,11 +12,9 @@ import {
   IRequestCreatedEvent,
   IRequestUpdatedEvent,
 } from '@/interfaces/events/request';
-import { ILive } from '@/interfaces/live';
-import { IRequest } from '@/interfaces/request';
-import { LiveRepository } from '@/repositories/live';
-import { RequestRepository } from '@/repositories/request';
+import { ISocketEventResponse } from '@/interfaces/events/socket';
 import { CacheService } from '@/services/cache';
+import { SocketEventService } from '@/services/socket-event';
 import { logException } from '@/utils/log-exception';
 import { Logger, UseGuards } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
@@ -45,8 +42,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly server: Server;
 
   constructor(
-    private readonly request_repository: RequestRepository,
-    private readonly live_repository: LiveRepository,
+    private readonly socket_event_service: SocketEventService,
     private readonly event_emitter: EventEmitter2,
     private readonly cache_service: CacheService,
   ) {}
@@ -129,7 +125,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   @SubscribeMessage(SocketInputEvent.GET_STATUS)
-  async onQueryStatus(
+  async onGetStatus(
     @ConnectedSocket() client: Socket,
   ): Promise<SocketAcknowlegment> {
     const { account_id } = client.handshake.auth;
@@ -137,22 +133,17 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       '{account_id}',
       account_id,
     );
-    const live: ILive | null =
-      await this.live_repository.findCurrentOnline(account_id);
 
-    client.emit(event_key, {
-      ok: true,
-      data: {
-        is_online: live !== null,
-        live,
-      },
-    });
+    const response: ISocketEventResponse =
+      await this.socket_event_service.getStatus(account_id);
 
-    return SocketAcknowlegment.OK;
+    client.emit(event_key, response.body);
+
+    return response.acknowlegment;
   }
 
   @SubscribeMessage(SocketInputEvent.GET_REQUESTS)
-  async onQueryRequests(
+  async onGetRequests(
     @ConnectedSocket() client: Socket,
   ): Promise<SocketAcknowlegment> {
     const { account_id } = client.handshake.auth;
@@ -160,28 +151,13 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       '{account_id}',
       account_id,
     );
-    const live: ILive | null =
-      await this.live_repository.findCurrentOnline(account_id);
 
-    if (!live) {
-      client.emit(event_key, {
-        ok: false,
-        code: ErrorCode.USER_OFFLINE,
-      });
+    const response: ISocketEventResponse =
+      await this.socket_event_service.getRequests(account_id);
 
-      return SocketAcknowlegment.ERROR;
-    }
+    client.emit(event_key, response.body);
 
-    const requests: IRequest[] = await this.request_repository.findByLiveId(
-      live._id,
-    );
-
-    client.emit(event_key, {
-      ok: true,
-      data: requests,
-    });
-
-    return SocketAcknowlegment.OK;
+    return response.acknowlegment;
   }
 
   @SubscribeMessage(SocketInputEvent.COMPLETE_REQUEST)
@@ -195,39 +171,31 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       account_id,
     );
 
-    const live: ILive | null =
-      await this.live_repository.findCurrentOnline(account_id);
+    const response: ISocketEventResponse =
+      await this.socket_event_service.completeRequest(account_id, request_id);
 
-    if (!live) {
-      client.emit(event_key, {
-        ok: false,
-        code: ErrorCode.USER_OFFLINE,
-      });
+    client.emit(event_key, response.body);
 
-      return SocketAcknowlegment.ERROR;
-    }
+    return response.acknowlegment;
+  }
 
-    const updated_request: IRequest | null =
-      await this.request_repository.update(request_id, {
-        completed: true,
-        completed_at: new Date(),
-      });
+  @SubscribeMessage(SocketInputEvent.SELECT_REQUEST)
+  async onSelectRequest(
+    @ConnectedSocket() client: Socket,
+    @MessageBody('request_id') request_id: string,
+  ): Promise<SocketAcknowlegment> {
+    const { account_id } = client.handshake.auth;
+    const event_key: string = SocketOutputEvent.REQUEST_SELECTED.replace(
+      '{account_id}',
+      account_id,
+    );
 
-    if (updated_request !== null) {
-      client.emit(event_key, {
-        ok: true,
-        data: updated_request,
-      });
+    const response: ISocketEventResponse =
+      await this.socket_event_service.selectRequest(account_id, request_id);
 
-      return SocketAcknowlegment.OK;
-    } else {
-      client.emit(event_key, {
-        ok: false,
-        code: ErrorCode.REQUEST_NOT_FOUND,
-      });
+    client.emit(event_key, response.body);
 
-      return SocketAcknowlegment.ERROR;
-    }
+    return response.acknowlegment;
   }
 
   private async getSocket(account_id: string): Promise<RemoteSocket<any, any>> {

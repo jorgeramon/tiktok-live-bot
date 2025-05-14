@@ -54,7 +54,7 @@ export class CommandListener {
       }
 
       const current_requests: IRequest[] =
-        await this.request_repository.findByLiveIdAndUserId(
+        await this.request_repository.findByLiveIdAndUserIdAndCompleted(
           live._id,
           event.user_id,
         );
