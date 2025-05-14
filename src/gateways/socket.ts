@@ -162,7 +162,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         if (!live) {
             client.emit(event_key, {
-                error: true,
+                ok: false,
                 code: ErrorCode.USER_OFFLINE
             });
 
