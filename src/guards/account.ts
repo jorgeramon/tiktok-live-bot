@@ -1,5 +1,5 @@
 import { IAccount } from "@interfaces/account";
-import { IMessage } from "@interfaces/message";
+import { IMessage } from "@interfaces/messages/message";
 import { CanActivate, ExecutionContext, Injectable, Logger } from "@nestjs/common";
 import { CacheService } from "@services/cache";
 

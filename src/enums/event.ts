@@ -20,6 +20,7 @@ export enum SocketEvent {
 
 export enum SocketListenerEvent {
     REQUEST_CREATED = 'request.created',
+    REQUEST_UPDATED = 'request.updated',
     ONLINE_STATUS = 'online.status'
 }
 
@@ -36,7 +37,8 @@ export enum SocketInputEvent {
 export enum SocketOutputEvent {
     GET_REQUESTS = '{account_id}.requests',
     GET_STATUS = '{account_id}.status',
-    REQUEST_CREATED = '{account_id}.request',
+    REQUEST_CREATED = '{account_id}.request.created',
+    REQUEST_UPDATED = '{account_id}.request.updated',
     REQUEST_COMPLETED = '{account_id}.request.completed'
 }
 

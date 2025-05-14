@@ -1,4 +1,4 @@
-import { IMessage } from "@interfaces/message";
+import { IMessage } from "@interfaces/messages/message";
 
 export interface IOnlineMessage extends IMessage {
     title?: string;

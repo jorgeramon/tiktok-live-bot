@@ -1,10 +1,10 @@
 import { CommandResolver } from "@core/command-resolver";
 import { TiktokInputEvent } from "@enums/event";
 import { AccountGuard } from "@guards/account";
-import { IChatMessage } from "@interfaces/chat-message";
-import { IEndMessage } from "@interfaces/end-message";
-import { IOnlineMessage } from "@interfaces/online-message";
-import { IOnlineStatusMessage } from "@interfaces/online-status-message";
+import { IChatMessage } from "@interfaces/messages/chat";
+import { IEndMessage } from "@interfaces/messages/end";
+import { IOnlineMessage } from "@interfaces/messages/online";
+import { IOnlineStatusMessage } from "@interfaces/messages/online-status";
 import { Controller, UseGuards } from "@nestjs/common";
 import { EventPattern, Payload } from "@nestjs/microservices";
 import { LiveService } from "@services/live";

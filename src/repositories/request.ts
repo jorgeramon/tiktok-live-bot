@@ -20,7 +20,8 @@ export class RequestRepository {
 
     async findByLiveIdAndUserId(live_id: string, user_id: string, completed = false): Promise<IRequest[]> {
         const documents: RequestDocument[] = await this.model
-            .find({ live_id: new Types.ObjectId(live_id), user_id, completed });
+            .find({ live_id: new Types.ObjectId(live_id), user_id, completed })
+            .sort('createdAt');
 
         return documents.map(document => document.toJSON()) as IRequest[];
     }
@@ -30,7 +31,7 @@ export class RequestRepository {
         return document.toJSON() as IRequest;
     }
 
-    async completeById(_id: string, completed = true): Promise<void> {
-        await this.model.findByIdAndUpdate(_id, { $set: { completed } });
+    async update(_id: string, data: Partial<IRequest>): Promise<void> {
+        await this.model.findByIdAndUpdate(_id, { $set: { ...data } });
     }
 }

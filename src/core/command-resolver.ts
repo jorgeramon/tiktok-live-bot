@@ -3,7 +3,7 @@ import { CommandListenerEvent } from "@enums/event";
 import { EmptyCommentException } from "@exceptions/empty-comment";
 import { UnresolvableAccountException } from "@exceptions/unresolvable-account";
 import { IAccount } from "@interfaces/account";
-import { IChatMessage } from "@interfaces/chat-message";
+import { IChatMessage } from "@interfaces/messages/chat";
 import { Injectable, Logger } from "@nestjs/common";
 import { EventEmitter2 } from "@nestjs/event-emitter";
 import { CacheService } from "@services/cache";
@@ -44,7 +44,7 @@ export class CommandResolver {
                 user_nickname: message.user_nickname,
                 user_picture: message.user_picture,
                 stream_id: message.stream_id,
-                argument: normalized_comment.slice(command.length)
+                argument: normalized_comment.slice(command.length).trim()
             });
         }
     }

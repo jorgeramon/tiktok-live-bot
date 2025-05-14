@@ -1,10 +1,10 @@
 import { ErrorCode, SocketAcknowlegment, SocketEvent, SocketInputEvent, SocketListenerEvent, SocketOutputEvent } from "@enums/event";
 import { UnresolvableSocketException } from "@exceptions/unresolvable-socket";
 import { SocketGuard } from "@guards/socket";
+import { IOnlineStatusEvent } from "@interfaces/events/online-status";
+import { IRequestCreatedEvent, IRequestUpdatedEvent } from "@interfaces/events/request";
 import { ILive } from "@interfaces/live";
-import { IOnlineStatusEvent } from "@interfaces/online-status-event";
 import { IRequest } from "@interfaces/request";
-import { IRequestEvent } from "@interfaces/request-event";
 import { Logger, UseGuards } from "@nestjs/common";
 import { EventEmitter2, OnEvent } from "@nestjs/event-emitter";
 import { ConnectedSocket, MessageBody, OnGatewayConnection, OnGatewayDisconnect, SubscribeMessage, WebSocketGateway, WebSocketServer } from "@nestjs/websockets";
@@ -34,26 +34,46 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
         private readonly cache_service: CacheService
     ) { }
 
-    handleConnection(socket: Socket): void {
+    handleConnection(client: Socket): void {
         this.event_emitter.emit(SocketEvent.CONNECTED, {
-            socket_id: socket.id,
-            account_id: socket.handshake.auth.account_id
+            socket_id: client.id,
+            account_id: client.handshake.auth.account_id
         });
     }
 
-    handleDisconnect(socket: Socket): void {
+    handleDisconnect(client: Socket): void {
         this.event_emitter.emit(SocketEvent.DISCONNECTED, {
-            socket_id: socket.id,
-            account_id: socket.handshake.auth.account_id
+            socket_id: client.id,
+            account_id: client.handshake.auth.account_id
         });
     }
 
     @OnEvent(SocketListenerEvent.REQUEST_CREATED)
-    async onRequest(event: IRequestEvent): Promise<void> {
+    async onRequestCreated(event: IRequestCreatedEvent): Promise<void> {
         try {
-            const socket: RemoteSocket<any, any> = await this.getSocket(event.account_id);
+            const client: RemoteSocket<any, any> = await this.getSocket(event.account_id);
             const event_key: string = SocketOutputEvent.REQUEST_CREATED.replace('{account_id}', event.account_id);
-            socket.emit(event_key, { ok: true, data: event.request });
+            client.emit(event_key, {
+                ok: true,
+                data: event.request
+            });
+        } catch (err) {
+            logException(this.logger, err);
+        }
+    }
+
+    @OnEvent(SocketListenerEvent.REQUEST_UPDATED)
+    async onRequestUpdate(event: IRequestUpdatedEvent): Promise<void> {
+        try {
+            const client: RemoteSocket<any, any> = await this.getSocket(event.account_id);
+            const event_key: string = SocketOutputEvent.REQUEST_UPDATED.replace('{account_id}', event.account_id);
+            client.emit(event_key, {
+                ok: true,
+                data: {
+                    request_id: event.request_id,
+                    new_request: event.new_request
+                }
+            });
         } catch (err) {
             logException(this.logger, err);
         }
@@ -62,9 +82,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @OnEvent(SocketListenerEvent.ONLINE_STATUS)
     async onStatus(event: IOnlineStatusEvent) {
         try {
-            const socket: RemoteSocket<any, any> = await this.getSocket(event.account_id);
+            const client: RemoteSocket<any, any> = await this.getSocket(event.account_id);
             const event_key: string = SocketOutputEvent.GET_STATUS.replace('{account_id}', event.account_id);
-            socket.emit(event_key, {
+            client.emit(event_key, {
                 ok: true,
                 data: {
                     is_online: event.is_online,
@@ -89,7 +109,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
         client.emit(event_key, {
             ok: true,
-            data: { is_online: live !== null, live }
+            data: {
+                is_online: live !== null,
+                live
+            }
         });
 
         return SocketAcknowlegment.OK;
@@ -146,7 +169,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
             return SocketAcknowlegment.ERROR;
         }
 
-        await this.request_repository.completeById(request_id);
+        await this.request_repository.update(request_id, { completed: true });
 
         client.emit(event_key, {
             ok: true,

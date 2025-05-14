@@ -1,4 +1,4 @@
-import { IOnlineMessage } from "@interfaces/online-message";
+import { IOnlineMessage } from "@interfaces/messages/online";
 
 export interface IOnlineStatusMessage {
     owner_username: string;
