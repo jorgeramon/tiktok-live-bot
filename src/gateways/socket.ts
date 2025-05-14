@@ -48,6 +48,10 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   ) {}
 
   handleConnection(client: Socket): void {
+    this.logger.verbose(
+      `Connected socket: ${client.id} - ${client.handshake.auth.account_id}`,
+    );
+
     this.event_emitter.emit(SocketEvent.CONNECTED, {
       socket_id: client.id,
       account_id: client.handshake.auth.account_id,
@@ -55,6 +59,9 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   }
 
   handleDisconnect(client: Socket): void {
+    this.logger.verbose(
+      `Disconnected socket: ${client.id} - ${client.handshake.auth.account_id}`,
+    );
     this.event_emitter.emit(SocketEvent.DISCONNECTED, {
       socket_id: client.id,
       account_id: client.handshake.auth.account_id,
