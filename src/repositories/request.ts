@@ -53,6 +53,7 @@ export class RequestRepository {
     const document: RequestDocument | null = await this.model.findByIdAndUpdate(
       _id,
       { $set: { ...data } },
+      { new: true },
     );
 
     return document !== null ? (document.toJSON() as IRequest) : null;

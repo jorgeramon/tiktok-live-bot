@@ -121,10 +121,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
 
       client.emit(event_key, {
         ok: true,
-        data: {
-          is_online: event.is_online,
-          live: event.live,
-        },
+        data: event.is_online,
       });
     } catch (err) {
       logException(this.logger, err);
