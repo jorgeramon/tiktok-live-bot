@@ -12,7 +12,7 @@ import {
   IRequestCreatedEvent,
   IRequestUpdatedEvent,
 } from '@/interfaces/events/request';
-import { ISocketEventResponse } from '@/interfaces/events/socket';
+import { ISocketEvent, ISocketEventResponse } from '@/interfaces/events/socket';
 import { CacheService } from '@/services/cache';
 import { SocketEventService } from '@/services/socket-event';
 import { logException } from '@/utils/log-exception';
@@ -71,15 +71,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent(SocketListenerEvent.REQUEST_CREATED)
   async onRequestCreated(event: IRequestCreatedEvent): Promise<void> {
     try {
-      const client: RemoteSocket<any, any> = await this.getSocket(
-        event.account_id,
-      );
       const event_key: string = SocketOutputEvent.REQUEST_CREATED.replace(
         '{account_id}',
         event.account_id,
       );
 
-      client.emit(event_key, {
+      this.broadcast(event.account_id, event_key, {
         ok: true,
         data: event.request,
       });
@@ -91,15 +88,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent(SocketListenerEvent.REQUEST_UPDATED)
   async onRequestUpdate(event: IRequestUpdatedEvent): Promise<void> {
     try {
-      const client: RemoteSocket<any, any> = await this.getSocket(
-        event.account_id,
-      );
       const event_key: string = SocketOutputEvent.REQUEST_UPDATED.replace(
         '{account_id}',
         event.account_id,
       );
 
-      client.emit(event_key, {
+      this.broadcast(event.account_id, event_key, {
         ok: true,
         data: event.request,
       });
@@ -111,15 +105,12 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent(SocketListenerEvent.ONLINE_STATUS)
   async onStatus(event: IOnlineStatusEvent) {
     try {
-      const client: RemoteSocket<any, any> = await this.getSocket(
-        event.account_id,
-      );
       const event_key: string = SocketOutputEvent.GET_STATUS.replace(
         '{account_id}',
         event.account_id,
       );
 
-      client.emit(event_key, {
+      this.broadcast(event.account_id, event_key, {
         ok: true,
         data: event.is_online,
       });
@@ -178,7 +169,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const response: ISocketEventResponse =
       await this.socket_event_service.completeRequest(account_id, request_id);
 
-    client.emit(event_key, response.body);
+    this.broadcast(account_id, event_key, response.body);
 
     return response.acknowlegment;
   }
@@ -197,28 +188,36 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     const response: ISocketEventResponse =
       await this.socket_event_service.selectRequest(account_id, request_id);
 
-    client.emit(event_key, response.body);
+    this.broadcast(account_id, event_key, response.body);
 
     return response.acknowlegment;
   }
 
-  private async getSocket(account_id: string): Promise<RemoteSocket<any, any>> {
-    const socket_id: string | null =
-      await this.cache_service.getSocketIdByAccountId(account_id);
+  private async getSockets(
+    account_id: string,
+  ): Promise<RemoteSocket<any, any>[]> {
+    const socket_ids: string[] =
+      await this.cache_service.getSocketIdsByAccountId(account_id);
 
-    if (!socket_id) {
+    if (!socket_ids.length) {
       throw new UnresolvableSocketException(account_id);
     }
 
     const sockets: RemoteSocket<any, any>[] = await this.server.fetchSockets();
-    const socket: RemoteSocket<any, any> | undefined = sockets.find(
-      (s) => s.id === socket_id,
-    );
 
-    if (!socket) {
-      throw new UnresolvableSocketException(account_id);
+    return sockets.filter(({ id }) => socket_ids.includes(id));
+  }
+
+  private async broadcast(
+    account_id: string,
+    event_key: string,
+    message: ISocketEvent,
+  ) {
+    const sockets: RemoteSocket<any, any>[] = await this.getSockets(account_id);
+
+    for (const socket of sockets) {
+      this.logger.verbose(`Emitting event: ${socket.id} - ${event_key}`);
+      socket.emit(event_key, message);
     }
-
-    return socket;
   }
 }

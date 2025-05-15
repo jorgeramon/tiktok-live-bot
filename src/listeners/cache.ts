@@ -4,13 +4,11 @@ import { IConnectedSocketEvent } from '@/interfaces/events/connected-socket';
 import { IDisconnectedSocketEvent } from '@/interfaces/events/disconnected-socket';
 import { CacheUtils } from '@/utils/cache-utils';
 import { Cache, CACHE_MANAGER } from '@nestjs/cache-manager';
-import { Inject, Injectable, Logger } from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 
 @Injectable()
 export class CacheListener {
-  private readonly logger: Logger = new Logger(CacheListener.name);
-
   constructor(@Inject(CACHE_MANAGER) private readonly cache_manager: Cache) {}
 
   @OnEvent(DatabaseEvent.ACCOUNT_CREATED)
@@ -22,23 +20,31 @@ export class CacheListener {
       ...(cache_accounts ?? []),
       account,
     ]);
-    this.logger.debug(`Cache account: ${account._id} - ${account.username}`);
   }
 
   @OnEvent(SocketEvent.CONNECTED)
   async onSocketConnected(event: IConnectedSocketEvent): Promise<void> {
-    await this.cache_manager.set<string>(
+    const socket_ids: string[] =
+      (await this.cache_manager.get<string[]>(
+        CacheUtils.SOCKET_KEY(event.account_id),
+      )) ?? [];
+
+    await this.cache_manager.set<string[]>(
       CacheUtils.SOCKET_KEY(event.account_id),
-      event.socket_id,
-    );
-    this.logger.debug(
-      `Cache socket: ${event.account_id} => ${event.socket_id}`,
+      [...new Set([...socket_ids, event.socket_id])],
     );
   }
 
   @OnEvent(SocketEvent.DISCONNECTED)
   async onSocketDisconnected(event: IDisconnectedSocketEvent): Promise<void> {
-    await this.cache_manager.del(CacheUtils.SOCKET_KEY(event.account_id));
-    this.logger.debug(`Deleted cache socket: ${event.socket_id}`);
+    const socket_ids: string[] =
+      (await this.cache_manager.get<string[]>(
+        CacheUtils.SOCKET_KEY(event.account_id),
+      )) ?? [];
+
+    await this.cache_manager.set<string[]>(
+      CacheUtils.SOCKET_KEY(event.account_id),
+      socket_ids.filter((socket_id) => socket_id !== event.socket_id),
+    );
   }
 }

@@ -29,8 +29,12 @@ export class CacheService implements OnApplicationBootstrap {
     );
   }
 
-  getSocketIdByAccountId(account_id: string): Promise<string | null> {
-    return this.cache_manager.get<string>(CacheUtils.SOCKET_KEY(account_id));
+  async getSocketIdsByAccountId(account_id: string): Promise<string[]> {
+    return (
+      (await this.cache_manager.get<string[]>(
+        CacheUtils.SOCKET_KEY(account_id),
+      )) ?? []
+    );
   }
 
   private async loadAccounts(): Promise<void> {
