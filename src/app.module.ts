@@ -23,7 +23,6 @@ import { APP_FILTER } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
-import { NotificationGateway } from './gateways/notification';
 
 const CORE = [CommandResolver];
 
@@ -38,7 +37,7 @@ const INTERNAL = [
   },
 ];
 
-const GATEWAYS = [SocketGateway, NotificationGateway];
+const GATEWAYS = [SocketGateway];
 
 const LISTENERS = [CommandListener, CacheListener];
 
