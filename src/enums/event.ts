@@ -1,12 +1,13 @@
-export enum TiktokInputEvent {
+export enum PubSubInputEvent {
   ONLINE = 'tiktok.online',
   CHAT = 'tiktok.chat',
   END = 'tiktok.end',
   ONLINE_STATUS = 'tiktok.online_status',
 }
 
-export enum TiktokOutputEvent {
+export enum PubSubOutputEvent {
   IS_ONLINE = 'tiktok.is_online',
+  SEND_MESSAGE = 'tiktok.send_message',
 }
 
 export enum DatabaseEvent {
@@ -29,10 +30,7 @@ export enum CommandListenerEvent {
 }
 
 export enum SocketInputEvent {
-  GET_STATUS = 'get.status',
-  GET_REQUESTS = 'get.requests',
   COMPLETE_REQUEST = 'complete.request',
-  SELECT_REQUEST = 'select.request',
 }
 
 export enum SocketOutputEvent {
@@ -41,7 +39,6 @@ export enum SocketOutputEvent {
   REQUEST_CREATED = '{account_id}.request.created',
   REQUEST_UPDATED = '{account_id}.request.updated',
   REQUEST_COMPLETED = '{account_id}.request.completed',
-  REQUEST_SELECTED = '{account_id}.request.selected',
 }
 
 export enum SocketAcknowlegment {

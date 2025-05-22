@@ -1,4 +1,5 @@
-import { TiktokController } from '@/controllers/tiktok';
+import { PubSubController } from '@/controllers/pubsub';
+import { WebController } from '@/controllers/web';
 import { CommandResolver } from '@/core/command-resolver';
 import { Startup } from '@/core/startup';
 import { Environment, Microservice } from '@/enums/environment';
@@ -14,6 +15,7 @@ import { Live, LiveSchema } from '@/schemas/live';
 import { Request, RequestSchema } from '@/schemas/request';
 import { CacheService } from '@/services/cache';
 import { LiveService } from '@/services/live';
+import { SocketEventService } from '@/services/socket-event';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -21,7 +23,7 @@ import { APP_FILTER } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
-import { SocketEventService } from './services/socket-event';
+import { NotificationGateway } from './gateways/notification';
 
 const CORE = [CommandResolver];
 
@@ -36,7 +38,7 @@ const INTERNAL = [
   },
 ];
 
-const GATEWAYS = [SocketGateway];
+const GATEWAYS = [SocketGateway, NotificationGateway];
 
 const LISTENERS = [CommandListener, CacheListener];
 
@@ -72,7 +74,7 @@ const LISTENERS = [CommandListener, CacheListener];
     CacheModule.register(),
     EventEmitterModule.forRoot(),
   ],
-  controllers: [TiktokController],
+  controllers: [PubSubController, WebController],
   providers: [
     ...CORE,
     ...REPOSITORIES,

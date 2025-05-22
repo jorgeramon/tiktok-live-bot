@@ -18,6 +18,18 @@ export class RequestRepository {
     return documents.map((document) => document.toJSON()) as IRequest[];
   }
 
+  async findByLiveIdAndCompleted(
+    live_id: string,
+    completed: boolean = false,
+  ): Promise<IRequest[]> {
+    const documents: RequestDocument[] = await this.model.find({
+      live_id: new Types.ObjectId(live_id),
+      completed,
+    });
+
+    return documents.map((document) => document.toJSON()) as IRequest[];
+  }
+
   async findByLiveIdAndUserIdAndCompleted(
     live_id: string,
     user_id: string,
@@ -30,18 +42,6 @@ export class RequestRepository {
     });
 
     return documents.map((document) => document.toJSON()) as IRequest[];
-  }
-
-  async findOneByLiveIdAndCurrent(
-    live_id: string,
-    current: boolean = false,
-  ): Promise<IRequest | null> {
-    const document: RequestDocument | null = await this.model.findOne({
-      live_id: new Types.ObjectId(live_id),
-      current,
-    });
-
-    return document !== null ? (document.toJSON() as IRequest) : null;
   }
 
   async save(data: Partial<IRequest>): Promise<IRequest> {

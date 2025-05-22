@@ -5,7 +5,6 @@ import {
   SocketListenerEvent,
   SocketOutputEvent,
 } from '@/enums/event';
-import { UnresolvableSocketException } from '@/exceptions/unresolvable-socket';
 import { SocketGuard } from '@/guards/socket';
 import { IOnlineStatusEvent } from '@/interfaces/events/online-status';
 import {
@@ -30,7 +29,7 @@ import {
 import { RemoteSocket, Server, Socket } from 'socket.io';
 
 @UseGuards(SocketGuard)
-@WebSocketGateway(2222, {
+@WebSocketGateway({
   cors: {
     origin: '*',
   },
@@ -119,42 +118,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     }
   }
 
-  @SubscribeMessage(SocketInputEvent.GET_STATUS)
-  async onGetStatus(
-    @ConnectedSocket() client: Socket,
-  ): Promise<SocketAcknowlegment> {
-    const { account_id } = client.handshake.auth;
-    const event_key: string = SocketOutputEvent.GET_STATUS.replace(
-      '{account_id}',
-      account_id,
-    );
-
-    const response: ISocketEventResponse =
-      await this.socket_event_service.getStatus(account_id);
-
-    client.emit(event_key, response.body);
-
-    return response.acknowlegment;
-  }
-
-  @SubscribeMessage(SocketInputEvent.GET_REQUESTS)
-  async onGetRequests(
-    @ConnectedSocket() client: Socket,
-  ): Promise<SocketAcknowlegment> {
-    const { account_id } = client.handshake.auth;
-    const event_key: string = SocketOutputEvent.GET_REQUESTS.replace(
-      '{account_id}',
-      account_id,
-    );
-
-    const response: ISocketEventResponse =
-      await this.socket_event_service.getRequests(account_id);
-
-    client.emit(event_key, response.body);
-
-    return response.acknowlegment;
-  }
-
   @SubscribeMessage(SocketInputEvent.COMPLETE_REQUEST)
   async onCompleteRequest(
     @ConnectedSocket() client: Socket,
@@ -174,25 +137,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     return response.acknowlegment;
   }
 
-  @SubscribeMessage(SocketInputEvent.SELECT_REQUEST)
-  async onSelectRequest(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('request_id') request_id: string,
-  ): Promise<SocketAcknowlegment> {
-    const { account_id } = client.handshake.auth;
-    const event_key: string = SocketOutputEvent.REQUEST_SELECTED.replace(
-      '{account_id}',
-      account_id,
-    );
-
-    const response: ISocketEventResponse =
-      await this.socket_event_service.selectRequest(account_id, request_id);
-
-    this.broadcast(account_id, event_key, response.body);
-
-    return response.acknowlegment;
-  }
-
   private async getSockets(
     account_id: string,
   ): Promise<RemoteSocket<any, any>[]> {
@@ -200,7 +144,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
       await this.cache_service.getSocketIdsByAccountId(account_id);
 
     if (!socket_ids.length) {
-      throw new UnresolvableSocketException(account_id);
+      return [];
     }
 
     const sockets: RemoteSocket<any, any>[] = await this.server.fetchSockets();

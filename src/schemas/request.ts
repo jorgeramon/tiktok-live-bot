@@ -25,9 +25,6 @@ export class Request {
   @Prop({ default: false })
   completed: boolean;
 
-  @Prop({ default: false })
-  current: boolean;
-
   @Prop({ required: true })
   requested_at: Date;
 

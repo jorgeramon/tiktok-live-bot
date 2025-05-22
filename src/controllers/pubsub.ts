@@ -1,5 +1,5 @@
 import { CommandResolver } from '@/core/command-resolver';
-import { TiktokInputEvent } from '@/enums/event';
+import { PubSubInputEvent } from '@/enums/event';
 import { AccountGuard } from '@/guards/account';
 import { IChatMessage } from '@/interfaces/messages/chat';
 import { IEndMessage } from '@/interfaces/messages/end';
@@ -11,13 +11,13 @@ import { EventPattern, Payload } from '@nestjs/microservices';
 
 @UseGuards(AccountGuard)
 @Controller()
-export class TiktokController {
+export class PubSubController {
   constructor(
     private readonly command_resolver: CommandResolver,
     private readonly live_service: LiveService,
   ) {}
 
-  @EventPattern(TiktokInputEvent.ONLINE_STATUS)
+  @EventPattern(PubSubInputEvent.ONLINE_STATUS)
   async isOnline(@Payload() message: IOnlineStatusMessage): Promise<void> {
     this.live_service.setOnlineStatus(
       message.owner_username,
@@ -26,7 +26,7 @@ export class TiktokController {
     );
   }
 
-  @EventPattern(TiktokInputEvent.ONLINE)
+  @EventPattern(PubSubInputEvent.ONLINE)
   async onOnline(@Payload() message: IOnlineMessage): Promise<void> {
     this.live_service.setOnlineStatus(
       message.owner_username,
@@ -35,12 +35,12 @@ export class TiktokController {
     );
   }
 
-  @EventPattern(TiktokInputEvent.CHAT)
+  @EventPattern(PubSubInputEvent.CHAT)
   async onChat(@Payload() message: IChatMessage): Promise<void> {
     await this.command_resolver.resolve(message);
   }
 
-  @EventPattern(TiktokInputEvent.END)
+  @EventPattern(PubSubInputEvent.END)
   async onEnd(@Payload() message: IEndMessage): Promise<void> {
     this.live_service.setOnlineStatus(
       message.owner_username,

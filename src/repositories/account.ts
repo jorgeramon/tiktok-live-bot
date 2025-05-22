@@ -29,6 +29,11 @@ export class AccountRepository {
     return document !== null ? (document.toJSON() as IAccount) : null;
   }
 
+  async findById(_id: string): Promise<IAccount | null> {
+    const document: AccountDocument | null = await this.model.findById(_id);
+    return document !== null ? (document.toJSON() as IAccount) : null;
+  }
+
   async save(data: Partial<IAccount>): Promise<IAccount> {
     const document: AccountDocument = await new this.model(data).save();
     return document.toJSON() as IAccount;

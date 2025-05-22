@@ -2,6 +2,9 @@ export enum Environment {
   MONGO_ATLAS = 'MONGO_ATLAS',
   REDIS_HOST = 'REDIS_HOST',
   REDIS_PORT = 'REDIS_PORT',
+  TIKTOK_SESSION_ID = 'TIKTOK_SESSION_ID',
+  TIKTOK_TARGET_IDC = 'TIKTOK_TARGET_IDC',
+  SERVER_PORT = 'SERVER_PORT',
 }
 
 export enum Microservice {

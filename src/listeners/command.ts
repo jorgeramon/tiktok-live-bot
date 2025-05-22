@@ -53,11 +53,12 @@ export class CommandListener {
         );
       }
 
-      const current_requests: IRequest[] =
-        await this.request_repository.findByLiveIdAndUserIdAndCompleted(
-          live._id,
-          event.user_id,
-        );
+      const total_requests: IRequest[] =
+        await this.request_repository.findByLiveIdAndCompleted(live._id);
+
+      const current_requests: IRequest[] = total_requests.filter(
+        (request) => request.user_id === event.user_id,
+      );
 
       if (
         current_requests.length === DefaultRequestConfig.MAXIMUM_PER_ACCOUNT
@@ -76,6 +77,9 @@ export class CommandListener {
         this.event_emitter.emit(SocketListenerEvent.REQUEST_UPDATED, {
           account_id: event.account_id,
           request: updated_request!,
+          owner_username: event.owner_username,
+          user_username: event.user_username,
+          user_nickname: event.user_nickname,
         });
       } else {
         this.logger.verbose(
@@ -95,6 +99,10 @@ export class CommandListener {
         this.event_emitter.emit(SocketListenerEvent.REQUEST_CREATED, {
           account_id: event.account_id,
           request,
+          owner_username: event.owner_username,
+          user_username: event.user_username,
+          user_nickname: event.user_nickname,
+          place: total_requests.length + 1,
         });
       }
     } catch (err) {
