@@ -17,8 +17,8 @@ jobs:
           script: |
             cd tiktok-live-bot
             git pull origin master
-            yarn install
             rm -rf dist .env
+            yarn install
             cp ${{ secrets.ENV_FOLDER }}/tiktok-live-bot .env
             yarn build
             pm2 restart pm2.yml
