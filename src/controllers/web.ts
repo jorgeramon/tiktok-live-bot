@@ -1,3 +1,4 @@
+import { WebExceptionFilter } from '@/exception-filters/web';
 import { TransformInterceptor } from '@/interceptors/transform';
 import { IRequest } from '@/interfaces/request';
 import { LiveService } from '@/services/live';
@@ -7,9 +8,11 @@ import {
   Get,
   Param,
   Post,
+  UseFilters,
   UseInterceptors,
 } from '@nestjs/common';
 
+@UseFilters(WebExceptionFilter)
 @UseInterceptors(TransformInterceptor)
 @Controller('tiktok/:id')
 export class WebController {

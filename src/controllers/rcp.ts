@@ -1,17 +1,19 @@
 import { CommandResolver } from '@/core/command-resolver';
 import { PubSubInputEvent } from '@/enums/event';
-import { AccountGuard } from '@/guards/account';
+import { RcpExceptionFilter } from '@/exception-filters/microservice';
+import { RcpGuard } from '@/guards/rcp';
 import { IChatMessage } from '@/interfaces/messages/chat';
 import { IEndMessage } from '@/interfaces/messages/end';
 import { IOnlineMessage } from '@/interfaces/messages/online';
 import { IOnlineStatusMessage } from '@/interfaces/messages/online-status';
 import { LiveService } from '@/services/live';
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller, UseFilters, UseGuards } from '@nestjs/common';
 import { EventPattern, Payload } from '@nestjs/microservices';
 
-@UseGuards(AccountGuard)
+@UseFilters(RcpExceptionFilter)
+@UseGuards(RcpGuard)
 @Controller()
-export class PubSubController {
+export class RcpController {
   constructor(
     private readonly command_resolver: CommandResolver,
     private readonly live_service: LiveService,

@@ -1,22 +1,13 @@
 import { IAccount } from '@/interfaces/account';
-import { IMessage } from '@/interfaces/messages/message';
 import { CacheService } from '@/services/cache';
-import {
-  CanActivate,
-  ExecutionContext,
-  Injectable,
-  Logger,
-} from '@nestjs/common';
+import { Logger } from '@nestjs/common';
 
-@Injectable()
-export class AccountGuard implements CanActivate {
+export class AccountGuard {
   private readonly logger: Logger = new Logger(AccountGuard.name);
 
   constructor(private readonly cache_service: CacheService) {}
 
-  async canActivate(context: ExecutionContext): Promise<boolean> {
-    const message = context.switchToRpc().getData<IMessage>();
-
+  async isValid(username: string): Promise<boolean> {
     const accounts: IAccount[] | null = await this.cache_service.getAccounts();
 
     if (!accounts) {
@@ -24,8 +15,6 @@ export class AccountGuard implements CanActivate {
       return false;
     }
 
-    return accounts.some(
-      (account) => account.username === message.owner_username,
-    );
+    return accounts.some((account) => account.username === username);
   }
 }

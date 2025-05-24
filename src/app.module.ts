@@ -1,9 +1,8 @@
-import { PubSubController } from '@/controllers/pubsub';
+import { RcpController } from '@/controllers/pubsub';
 import { WebController } from '@/controllers/web';
 import { CommandResolver } from '@/core/command-resolver';
 import { Startup } from '@/core/startup';
 import { Environment, Microservice } from '@/enums/environment';
-import { HandlerExceptionFilter } from '@/exception-filters/handler';
 import { SocketGateway } from '@/gateways/socket';
 import { CacheListener } from '@/listeners/cache';
 import { CommandListener } from '@/listeners/command';
@@ -19,7 +18,6 @@ import { SocketEventService } from '@/services/socket-event';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { APP_FILTER } from '@nestjs/core';
 import { EventEmitterModule } from '@nestjs/event-emitter';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -29,13 +27,6 @@ const CORE = [CommandResolver];
 const REPOSITORIES = [AccountRepository, LiveRepository, RequestRepository];
 
 const SERVICES = [Startup, CacheService, LiveService, SocketEventService];
-
-const INTERNAL = [
-  {
-    provide: APP_FILTER,
-    useClass: HandlerExceptionFilter,
-  },
-];
 
 const GATEWAYS = [SocketGateway];
 
@@ -73,14 +64,7 @@ const LISTENERS = [CommandListener, CacheListener];
     CacheModule.register(),
     EventEmitterModule.forRoot(),
   ],
-  controllers: [PubSubController, WebController],
-  providers: [
-    ...CORE,
-    ...REPOSITORIES,
-    ...SERVICES,
-    ...INTERNAL,
-    ...GATEWAYS,
-    ...LISTENERS,
-  ],
+  controllers: [RcpController, WebController],
+  providers: [...CORE, ...REPOSITORIES, ...SERVICES, ...GATEWAYS, ...LISTENERS],
 })
 export class AppModule {}

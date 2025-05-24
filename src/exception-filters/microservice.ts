@@ -9,8 +9,8 @@ import {
 import { Observable, of } from 'rxjs';
 
 @Catch(RuntimeException)
-export class HandlerExceptionFilter implements RpcExceptionFilter<Error> {
-  private readonly logger: Logger = new Logger(HandlerExceptionFilter.name);
+export class RcpExceptionFilter implements RpcExceptionFilter<Error> {
+  private readonly logger: Logger = new Logger(RcpExceptionFilter.name);
 
   catch(exception: RuntimeException, _host: ArgumentsHost): Observable<any> {
     logException(this.logger, exception);
