@@ -1,4 +1,4 @@
-import { RcpController } from '@/controllers/pubsub';
+import { RcpController } from '@/controllers/rcp';
 import { WebController } from '@/controllers/web';
 import { CommandResolver } from '@/core/command-resolver';
 import { Startup } from '@/core/startup';

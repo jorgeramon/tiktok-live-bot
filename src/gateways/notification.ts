@@ -1,5 +1,5 @@
 import { Environment, Microservice } from '@/enums/environment';
-import { PubSubOutputEvent, SocketListenerEvent } from '@/enums/event';
+import { RcpOutputEvent, SocketListenerEvent } from '@/enums/event';
 import {
   IRequestCreatedEvent,
   IRequestUpdatedEvent,
@@ -19,7 +19,7 @@ export class NotificationGateway {
 
   @OnEvent(SocketListenerEvent.REQUEST_CREATED)
   async onRequestCreated(event: IRequestCreatedEvent): Promise<void> {
-    this.client.emit(PubSubOutputEvent.SEND_MESSAGE, {
+    this.client.emit(RcpOutputEvent.SEND_MESSAGE, {
       owner_username: event.owner_username,
       message: ':)',
       session_id: this.config_service.get<string>(
@@ -33,7 +33,7 @@ export class NotificationGateway {
 
   @OnEvent(SocketListenerEvent.REQUEST_UPDATED)
   async onRequestUpdate(event: IRequestUpdatedEvent): Promise<void> {
-    this.client.emit(PubSubOutputEvent.SEND_MESSAGE, {
+    this.client.emit(RcpOutputEvent.SEND_MESSAGE, {
       owner_username: event.owner_username,
       message: ':)',
       session_id: this.config_service.get<string>(

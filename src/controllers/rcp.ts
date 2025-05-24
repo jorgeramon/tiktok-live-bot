@@ -1,6 +1,6 @@
 import { CommandResolver } from '@/core/command-resolver';
-import { PubSubInputEvent } from '@/enums/event';
-import { RcpExceptionFilter } from '@/exception-filters/microservice';
+import { RcpInputEvent } from '@/enums/event';
+import { RcpExceptionFilter } from '@/exception-filters/rcp';
 import { RcpGuard } from '@/guards/rcp';
 import { IChatMessage } from '@/interfaces/messages/chat';
 import { IEndMessage } from '@/interfaces/messages/end';
@@ -19,7 +19,7 @@ export class RcpController {
     private readonly live_service: LiveService,
   ) {}
 
-  @EventPattern(PubSubInputEvent.ONLINE_STATUS)
+  @EventPattern(RcpInputEvent.ONLINE_STATUS)
   async isOnline(@Payload() message: IOnlineStatusMessage): Promise<void> {
     this.live_service.setOnlineStatus(
       message.owner_username,
@@ -28,7 +28,7 @@ export class RcpController {
     );
   }
 
-  @EventPattern(PubSubInputEvent.ONLINE)
+  @EventPattern(RcpInputEvent.ONLINE)
   async onOnline(@Payload() message: IOnlineMessage): Promise<void> {
     this.live_service.setOnlineStatus(
       message.owner_username,
@@ -37,12 +37,12 @@ export class RcpController {
     );
   }
 
-  @EventPattern(PubSubInputEvent.CHAT)
+  @EventPattern(RcpInputEvent.CHAT)
   async onChat(@Payload() message: IChatMessage): Promise<void> {
     await this.command_resolver.resolve(message);
   }
 
-  @EventPattern(PubSubInputEvent.END)
+  @EventPattern(RcpInputEvent.END)
   async onEnd(@Payload() message: IEndMessage): Promise<void> {
     this.live_service.setOnlineStatus(
       message.owner_username,

@@ -1,11 +1,11 @@
-export enum PubSubInputEvent {
+export enum RcpInputEvent {
   ONLINE = 'tiktok.online',
   CHAT = 'tiktok.chat',
   END = 'tiktok.end',
   ONLINE_STATUS = 'tiktok.online_status',
 }
 
-export enum PubSubOutputEvent {
+export enum RcpOutputEvent {
   IS_ONLINE = 'tiktok.is_online',
   SEND_MESSAGE = 'tiktok.send_message',
 }

@@ -1,5 +1,5 @@
 import { Microservice } from '@/enums/environment';
-import { PubSubOutputEvent } from '@/enums/event';
+import { RcpOutputEvent } from '@/enums/event';
 import { IAccount } from '@/interfaces/account';
 import { AccountRepository } from '@/repositories/account';
 import { Inject, Logger, OnApplicationBootstrap } from '@nestjs/common';
@@ -20,7 +20,7 @@ export class Startup implements OnApplicationBootstrap {
     this.logger.debug(`Checking if accounts are online...`);
 
     for (const account of accounts) {
-      this.client.emit(PubSubOutputEvent.IS_ONLINE, account.username);
+      this.client.emit(RcpOutputEvent.IS_ONLINE, account.username);
     }
   }
 }

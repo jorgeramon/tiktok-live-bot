@@ -1,5 +1,5 @@
 import { Environment, Microservice } from '@/enums/environment';
-import { PubSubOutputEvent, SocketListenerEvent } from '@/enums/event';
+import { RcpOutputEvent, SocketListenerEvent } from '@/enums/event';
 import { UnresolvableAccountException } from '@/exceptions/unresolvable-account';
 import { IAccount } from '@/interfaces/account';
 import { ILive } from '@/interfaces/live';
@@ -178,7 +178,7 @@ export class LiveService {
 
     this.logger.debug(`Sending message to ${account.username} LIVE`);
 
-    this.client.emit(PubSubOutputEvent.SEND_MESSAGE, {
+    this.client.emit(RcpOutputEvent.SEND_MESSAGE, {
       username: account.username,
       session_id: this.config_service.get<string>(
         Environment.TIKTOK_SESSION_ID,
