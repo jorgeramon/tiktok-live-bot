@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 
 @UseInterceptors(TransformInterceptor)
-@Controller('api/tiktok/:id')
+@Controller('tiktok/:id')
 export class WebController {
   constructor(private readonly live_service: LiveService) {}
 
