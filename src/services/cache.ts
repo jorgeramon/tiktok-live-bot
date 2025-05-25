@@ -29,6 +29,11 @@ export class CacheService implements OnApplicationBootstrap {
     );
   }
 
+  async getAccountById(id: string): Promise<IAccount | null> {
+    const cache_accounts: IAccount[] = await this.getAccounts();
+    return cache_accounts.find((account) => account._id === id) ?? null;
+  }
+
   async getSocketIdsByAccountId(account_id: string): Promise<string[]> {
     return (
       (await this.cache_manager.get<string[]>(

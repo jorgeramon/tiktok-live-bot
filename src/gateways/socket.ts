@@ -70,6 +70,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent(SocketListenerEvent.REQUEST_CREATED)
   async onRequestCreated(event: IRequestCreatedEvent): Promise<void> {
     try {
+      this.logger.verbose(`REQUEST_CREATED: ${JSON.stringify(event, null, 4)}`);
       const event_key: string = SocketOutputEvent.REQUEST_CREATED.replace(
         '{account_id}',
         event.account_id,
@@ -87,6 +88,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent(SocketListenerEvent.REQUEST_UPDATED)
   async onRequestUpdate(event: IRequestUpdatedEvent): Promise<void> {
     try {
+      this.logger.verbose(`REQUEST_UPDATED: ${JSON.stringify(event, null, 4)}`);
       const event_key: string = SocketOutputEvent.REQUEST_UPDATED.replace(
         '{account_id}',
         event.account_id,
@@ -104,6 +106,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   @OnEvent(SocketListenerEvent.ONLINE_STATUS)
   async onStatus(event: IOnlineStatusEvent) {
     try {
+      this.logger.verbose(`ONLINE_STATUS: ${JSON.stringify(event, null, 4)}`);
       const event_key: string = SocketOutputEvent.GET_STATUS.replace(
         '{account_id}',
         event.account_id,
@@ -123,6 +126,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     @ConnectedSocket() client: Socket,
     @MessageBody('request_id') request_id: string,
   ): Promise<SocketAcknowlegment> {
+    this.logger.verbose(`COMPLETE_REQUEST: ${request_id}`);
     const { account_id } = client.handshake.auth;
     const event_key: string = SocketOutputEvent.REQUEST_COMPLETED.replace(
       '{account_id}',
