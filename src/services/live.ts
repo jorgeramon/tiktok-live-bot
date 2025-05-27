@@ -1,5 +1,5 @@
-import { Environment, Microservice } from '@/enums/environment';
-import { RcpOutputEvent, SocketListenerEvent } from '@/enums/event';
+import { Microservice } from '@/enums/environment';
+import { SocketListenerEvent } from '@/enums/event';
 import { UnresolvableAccountException } from '@/exceptions/unresolvable-account';
 import { IAccount } from '@/interfaces/account';
 import { ILive } from '@/interfaces/live';
@@ -158,38 +158,6 @@ export class LiveService {
     return this.request_repository.findByLiveId(live._id);
   }
 
-  async sendMessage(account_id: string, message: string): Promise<void> {
-    const account: IAccount | null =
-      await this.account_repository.findById(account_id);
-
-    if (account == null) {
-      throw new UnresolvableAccountException(account_id);
-    }
-
-    const live: ILive | null =
-      await this.live_repository.findCurrentOnline(account_id);
-
-    if (!live) {
-      this.logger.debug(
-        `${account.username} doesnt have an active LIVE to send messages`,
-      );
-      return;
-    }
-
-    this.logger.debug(`Sending message to ${account.username} LIVE`);
-
-    this.client.emit(RcpOutputEvent.SEND_MESSAGE, {
-      username: account.username,
-      session_id: this.config_service.get<string>(
-        Environment.TIKTOK_SESSION_ID,
-      ),
-      target_idc: this.config_service.get<string>(
-        Environment.TIKTOK_TARGET_IDC,
-      ),
-      message,
-    });
-  }
-
   async completeRequest(
     account_id: string,
     request_id: string,
@@ -219,6 +187,11 @@ export class LiveService {
     if (!request) {
       throw new Error();
     }
+
+    this.event_emitter.emit(SocketListenerEvent.REQUEST_UPDATED, {
+      account_id,
+      request,
+    });
 
     return request;
   }

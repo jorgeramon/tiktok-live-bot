@@ -3,11 +3,9 @@ import { TransformInterceptor } from '@/interceptors/transform';
 import { IRequest } from '@/interfaces/request';
 import { LiveService } from '@/services/live';
 import {
-  Body,
   Controller,
   Get,
   Param,
-  Post,
   Put,
   UseFilters,
   UseInterceptors,
@@ -39,13 +37,5 @@ export class WebController {
     @Param('account_id') account_id: string,
   ): Promise<boolean> {
     return this.live_service.getOnlineStatus(account_id);
-  }
-
-  @Post('messages')
-  async sendMessages(
-    @Param('account_id') account_id: string,
-    @Body('message') message: string,
-  ): Promise<void> {
-    this.live_service.sendMessage(account_id, message);
   }
 }

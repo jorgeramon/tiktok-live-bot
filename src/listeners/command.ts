@@ -77,9 +77,6 @@ export class CommandListener {
         this.event_emitter.emit(SocketListenerEvent.REQUEST_UPDATED, {
           account_id: event.account_id,
           request: updated_request!,
-          owner_username: event.owner_username,
-          user_username: event.user_username,
-          user_nickname: event.user_nickname,
         });
       } else {
         this.logger.verbose(

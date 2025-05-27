@@ -7,7 +7,6 @@ export enum RcpInputEvent {
 
 export enum RcpOutputEvent {
   IS_ONLINE = 'tiktok.is_online',
-  SEND_MESSAGE = 'tiktok.send_message',
 }
 
 export enum DatabaseEvent {
