@@ -189,4 +189,37 @@ export class LiveService {
       message,
     });
   }
+
+  async completeRequest(
+    account_id: string,
+    request_id: string,
+  ): Promise<IRequest> {
+    const account: IAccount | null =
+      await this.account_repository.findById(account_id);
+
+    if (account == null) {
+      throw new UnresolvableAccountException(account_id);
+    }
+
+    const live: ILive | null =
+      await this.live_repository.findCurrentOnline(account_id);
+
+    if (!live) {
+      this.logger.debug(
+        `${account.username} doesnt have an active LIVE to send messages`,
+      );
+      throw new Error();
+    }
+
+    const request: IRequest | null = await this.request_repository.update(
+      request_id,
+      { completed: true, completed_at: new Date() },
+    );
+
+    if (!request) {
+      throw new Error();
+    }
+
+    return request;
+  }
 }

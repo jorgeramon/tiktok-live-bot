@@ -1,7 +1,5 @@
 import {
-  SocketAcknowlegment,
   SocketEvent,
-  SocketInputEvent,
   SocketListenerEvent,
   SocketOutputEvent,
 } from '@/enums/event';
@@ -11,18 +9,14 @@ import {
   IRequestCreatedEvent,
   IRequestUpdatedEvent,
 } from '@/interfaces/events/request';
-import { ISocketEvent, ISocketEventResponse } from '@/interfaces/events/socket';
+import { ISocketEvent } from '@/interfaces/events/socket';
 import { CacheService } from '@/services/cache';
-import { SocketEventService } from '@/services/socket-event';
 import { logException } from '@/utils/log-exception';
 import { Logger, UseGuards } from '@nestjs/common';
 import { EventEmitter2, OnEvent } from '@nestjs/event-emitter';
 import {
-  ConnectedSocket,
-  MessageBody,
   OnGatewayConnection,
   OnGatewayDisconnect,
-  SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets';
@@ -41,7 +35,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   private readonly server: Server;
 
   constructor(
-    private readonly socket_event_service: SocketEventService,
     private readonly event_emitter: EventEmitter2,
     private readonly cache_service: CacheService,
   ) {}
@@ -107,7 +100,7 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
   async onStatus(event: IOnlineStatusEvent) {
     try {
       this.logger.verbose(`ONLINE_STATUS: ${JSON.stringify(event, null, 4)}`);
-      const event_key: string = SocketOutputEvent.GET_STATUS.replace(
+      const event_key: string = SocketOutputEvent.STATUS_UPDATED.replace(
         '{account_id}',
         event.account_id,
       );
@@ -119,26 +112,6 @@ export class SocketGateway implements OnGatewayConnection, OnGatewayDisconnect {
     } catch (err) {
       logException(this.logger, err);
     }
-  }
-
-  @SubscribeMessage(SocketInputEvent.COMPLETE_REQUEST)
-  async onCompleteRequest(
-    @ConnectedSocket() client: Socket,
-    @MessageBody('request_id') request_id: string,
-  ): Promise<SocketAcknowlegment> {
-    this.logger.verbose(`COMPLETE_REQUEST: ${request_id}`);
-    const { account_id } = client.handshake.auth;
-    const event_key: string = SocketOutputEvent.REQUEST_COMPLETED.replace(
-      '{account_id}',
-      account_id,
-    );
-
-    const response: ISocketEventResponse =
-      await this.socket_event_service.completeRequest(account_id, request_id);
-
-    this.broadcast(account_id, event_key, response.body);
-
-    return response.acknowlegment;
   }
 
   private async getSockets(

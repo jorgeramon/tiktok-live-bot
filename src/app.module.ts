@@ -14,7 +14,6 @@ import { Live, LiveSchema } from '@/schemas/live';
 import { Request, RequestSchema } from '@/schemas/request';
 import { CacheService } from '@/services/cache';
 import { LiveService } from '@/services/live';
-import { SocketEventService } from '@/services/socket-event';
 import { CacheModule } from '@nestjs/cache-manager';
 import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -26,7 +25,7 @@ const CORE = [CommandResolver];
 
 const REPOSITORIES = [AccountRepository, LiveRepository, RequestRepository];
 
-const SERVICES = [Startup, CacheService, LiveService, SocketEventService];
+const SERVICES = [Startup, CacheService, LiveService];
 
 const GATEWAYS = [SocketGateway];
 
