@@ -15,10 +15,4 @@ jobs:
           host: ${{ secrets.SSH_HOST }}
           username: ${{ secrets.SSH_USERNAME }}
           script: |
-            cd tiktok-live-bot
-            git pull origin master
-            rm -rf dist .env
-            yarn install
-            cp ${{ secrets.ENV_FOLDER }}/tiktok-live-bot .env
-            yarn build
-            pm2 restart pm2.yml
+            sh ${{ secrets.DEPLOY_SCRIPTS }}/tiktok-live-bot.sh
