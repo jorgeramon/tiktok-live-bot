@@ -1,14 +1,7 @@
-// NestJS
+import { IAccount } from '@/interfaces/account';
+import { Account, AccountDocument } from '@/schemas/account';
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-
-// Schemas
-import { Account, AccountDocument } from '@/schemas/account';
-
-// Interfaces
-import { IAccount } from '@/interfaces/account';
-
-// NPM
 import { Model } from 'mongoose';
 
 @Injectable()

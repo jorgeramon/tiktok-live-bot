@@ -24,7 +24,7 @@ export class RcpController {
     this.live_service.setOnlineStatus(
       message.owner_username,
       message.is_online,
-      message.room_info?.stream_id,
+      message.room_info.stream_id,
     );
   }
 

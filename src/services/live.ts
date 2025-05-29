@@ -1,4 +1,3 @@
-import { Microservice } from '@/enums/environment';
 import { SocketListenerEvent } from '@/enums/event';
 import { UnresolvableAccountException } from '@/exceptions/unresolvable-account';
 import { IAccount } from '@/interfaces/account';
@@ -7,19 +6,14 @@ import { IRequest } from '@/interfaces/request';
 import { AccountRepository } from '@/repositories/account';
 import { LiveRepository } from '@/repositories/live';
 import { RequestRepository } from '@/repositories/request';
-import { Inject, Injectable, Logger } from '@nestjs/common';
-import { ConfigService } from '@nestjs/config';
+import { Injectable, Logger } from '@nestjs/common';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { ClientProxy } from '@nestjs/microservices';
 
 @Injectable()
 export class LiveService {
   private readonly logger: Logger = new Logger(LiveService.name);
 
   constructor(
-    @Inject(Microservice.MESSAGE_BROKER)
-    private readonly client: ClientProxy,
-    private readonly config_service: ConfigService,
     private readonly account_repository: AccountRepository,
     private readonly live_repository: LiveRepository,
     private readonly request_repository: RequestRepository,

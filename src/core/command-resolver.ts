@@ -1,4 +1,5 @@
 import { DefaultRequestConfig } from '@/enums/default';
+import { Environment } from '@/enums/environment';
 import { CommandListenerEvent } from '@/enums/event';
 import { EmptyCommentException } from '@/exceptions/empty-comment';
 import { UnresolvableAccountException } from '@/exceptions/unresolvable-account';
@@ -6,6 +7,7 @@ import { IAccount } from '@/interfaces/account';
 import { IChatMessage } from '@/interfaces/messages/chat';
 import { CacheService } from '@/services/cache';
 import { Injectable, Logger } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
@@ -15,6 +17,7 @@ export class CommandResolver {
   constructor(
     private readonly cache_service: CacheService,
     private readonly event_emitter: EventEmitter2,
+    private readonly config_service: ConfigService,
   ) {}
 
   async resolve(message: IChatMessage): Promise<void> {
@@ -30,11 +33,13 @@ export class CommandResolver {
       throw new UnresolvableAccountException(message.owner_username);
     }
 
+    const bypass_play: boolean = !!this.config_service.get(
+      Environment.BYPASS_PLAY,
+    );
+    const normalized_comment = message.comment.trim().toLowerCase();
     const command = `${DefaultRequestConfig.PREFIX}${DefaultRequestConfig.PLAY}`;
 
-    const normalized_comment = message.comment.trim().toLowerCase();
-
-    if (normalized_comment.startsWith(command)) {
+    if (bypass_play || normalized_comment.startsWith(command)) {
       this.event_emitter.emit(CommandListenerEvent.REQUEST_PLAY, {
         account_id: account._id,
         owner_id: message.owner_id,
