@@ -37,9 +37,25 @@ export class CommandResolver {
       Environment.BYPASS_PLAY,
     );
     const normalized_comment = message.comment.trim().toLowerCase();
-    const command = `${DefaultRequestConfig.PREFIX}${DefaultRequestConfig.PLAY}`;
 
-    if (bypass_play || normalized_comment.startsWith(command)) {
+    const prefixes = ['!', '.', '+'];
+
+    const command_combinations = prefixes.flatMap((prefix) => [
+      `${prefix}${DefaultRequestConfig.PLAY}`,
+      `${prefix} ${DefaultRequestConfig.PLAY}`,
+    ]);
+
+    const command_used = command_combinations.find((command) =>
+      normalized_comment.startsWith(command),
+    );
+
+    if (command_used) {
+      this.logger.debug(
+        `${message.user_nickname} used command ${command_used}`,
+      );
+    }
+
+    if (bypass_play || command_used) {
       this.event_emitter.emit(CommandListenerEvent.REQUEST_PLAY, {
         account_id: account._id,
         owner_id: message.owner_id,
@@ -49,7 +65,7 @@ export class CommandResolver {
         user_nickname: message.user_nickname,
         user_picture: message.user_picture,
         stream_id: message.stream_id,
-        argument: normalized_comment.slice(command.length).trim(),
+        argument: normalized_comment.slice(command_used?.length ?? 0).trim(),
       });
     }
   }
